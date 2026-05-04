@@ -29,7 +29,27 @@ class ViewController: UIViewController {
     var currentZoomFactor: CGFloat = 1.0
     var isControlsVisible = false
     
+    enum AspectRatio: String, CaseIterable {
+        case ratio4_3 = "4:3"
+        case ratio16_9 = "16:9"
+        case ratio1_1 = "1:1"
+    }
+    var currentAspectRatio: AspectRatio = .ratio4_3
+    
     // MARK: - UI Components
+    let aspectRatioButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("4:3", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12, weight: .bold)
+        button.tintColor = .white
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.white.cgColor
+        button.layer.cornerRadius = 4
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        return button
+    }()
     let controlsButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)

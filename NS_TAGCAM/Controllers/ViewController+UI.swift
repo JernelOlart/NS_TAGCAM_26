@@ -24,7 +24,7 @@ extension ViewController {
         advancedControlsStack.addArrangedSubview(isoStack)
         advancedControlsStack.addArrangedSubview(expStack)
         
-        let controlStack = UIStackView(arrangedSubviews: [logoImageView, flashButton, gridButton, switchCameraButton, controlsButton, infoButton])
+        let controlStack = UIStackView(arrangedSubviews: [logoImageView, flashButton, aspectRatioButton, gridButton, switchCameraButton, controlsButton, infoButton])
         controlStack.axis = .horizontal
         controlStack.distribution = .equalSpacing
         controlStack.alignment = .center
@@ -81,6 +81,7 @@ extension ViewController {
         controlsButton.addTarget(self, action: #selector(toggleControls), for: .touchUpInside)
         isoSlider.addTarget(self, action: #selector(isoChanged(_:)), for: .valueChanged)
         exposureSlider.addTarget(self, action: #selector(exposureChanged(_:)), for: .valueChanged)
+        aspectRatioButton.addTarget(self, action: #selector(toggleAspectRatio), for: .touchUpInside)
         
         let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0, 3.0]
         for (index, zoom) in zoomLevels.enumerated() {

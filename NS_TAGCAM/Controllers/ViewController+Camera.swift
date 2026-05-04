@@ -6,6 +6,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
     
     func setupCamera() {
         captureSession = AVCaptureSession()
+        captureSession.sessionPreset = .photo
         captureSession.beginConfiguration()
         
         guard let videoDevice = bestCamera(for: .back) else { return }
@@ -21,6 +22,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         photoOutput = AVCapturePhotoOutput()
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
+            photoOutput.isHighResolutionCaptureEnabled = true
         }
         
         captureSession.commitConfiguration()
@@ -58,6 +60,10 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             }
             let photoSettings = AVCapturePhotoSettings()
             photoSettings.flashMode = self.flashMode
+            photoSettings.isHighResolutionPhotoEnabled = true
+            if #available(iOS 13.0, *) {
+                photoSettings.photoQualityPrioritization = .quality
+            }
             self.photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
     }
@@ -69,7 +75,8 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         DispatchQueue.global(qos: .userInitiated).async {
             // we safely unwrap current location or use a default
             let location = self.currentLocation ?? CoreLocation.CLLocation()
-            let watermarkedImage = self.addWatermark(image: image, location: location)
+            let croppedImage = self.cropToAspectRatio(image: image, aspectRatio: self.currentAspectRatio)
+            let watermarkedImage = self.addWatermark(image: croppedImage, location: location)
             
             DispatchQueue.main.async {
                 self.imageView.image = watermarkedImage
@@ -155,6 +162,32 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             logo.draw(in: logoRect, blendMode: .normal, alpha: 0.8)
         }
         
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return result ?? image
+    }
+    
+    func cropToAspectRatio(image: UIImage, aspectRatio: AspectRatio) -> UIImage {
+        let originalSize = image.size
+        let targetRatio: CGFloat
+        switch aspectRatio {
+        case .ratio4_3: targetRatio = 4.0 / 3.0
+        case .ratio16_9: targetRatio = 16.0 / 9.0
+        case .ratio1_1: targetRatio = 1.0
+        }
+        
+        let currentRatio = originalSize.width / originalSize.height
+        var newSize: CGSize
+        if currentRatio > targetRatio {
+            newSize = CGSize(width: originalSize.height * targetRatio, height: originalSize.height)
+        } else {
+            newSize = CGSize(width: originalSize.width, height: originalSize.width / targetRatio)
+        }
+        
+        let rect = CGRect(x: (originalSize.width - newSize.width) / 2, y: (originalSize.height - newSize.height) / 2, width: newSize.width, height: newSize.height)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, image.scale)
+        image.draw(at: CGPoint(x: -rect.origin.x, y: -rect.origin.y))
         let result = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return result ?? image

@@ -110,6 +110,16 @@ extension ViewController {
         feedbackGenerator()
     }
     
+    @objc func toggleAspectRatio() {
+        feedbackGenerator()
+        let allRatios = AspectRatio.allCases
+        if let currentIndex = allRatios.firstIndex(of: currentAspectRatio) {
+            let nextIndex = (currentIndex + 1) % allRatios.count
+            currentAspectRatio = allRatios[nextIndex]
+            aspectRatioButton.setTitle(currentAspectRatio.rawValue, for: .normal)
+        }
+    }
+    
     @objc func toggleFlash() {
         feedbackGenerator()
         switch flashMode {
