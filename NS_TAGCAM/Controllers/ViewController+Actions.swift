@@ -150,30 +150,25 @@ extension ViewController {
                 
                 DispatchQueue.main.async {
                     self.currentZoomFactor = 1.0
-                    self.zoomSlider.value = 1.0
-                    self.hideZoomSlider()
+                    self.updateZoom(factor: 1.0)
                 }
             } catch { print(error) }
         }
     }
     
-    @objc func zoomSliderChanged(_ sender: UISlider) {
-        updateZoom(factor: CGFloat(sender.value))
-        showZoomSlider()
+    @objc func zoomButtonTapped(_ sender: UIButton) {
+        feedbackGenerator()
+        let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0, 3.0]
+        let selectedZoom = zoomLevels[sender.tag]
+        updateZoom(factor: selectedZoom)
     }
     
     @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-        if gesture.state == .began {
-            showZoomSlider()
-        }
         if gesture.state == .changed {
             let factor = currentZoomFactor * gesture.scale
             updateZoom(factor: factor)
         } else if gesture.state == .ended {
-            currentZoomFactor = min(max(currentZoomFactor * gesture.scale, 1.0), 5.0)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.hideZoomSlider()
-            }
+            currentZoomFactor = max(0.5, min(currentZoomFactor * gesture.scale, 5.0))
         }
     }
     
@@ -181,22 +176,33 @@ extension ViewController {
         let device = videoDeviceInput.device
         do {
             try device.lockForConfiguration()
-            let zoom = min(max(factor, 1.0), device.activeFormat.videoMaxZoomFactor, 5.0)
+            let minZoom = max(0.5, device.minAvailableVideoZoomFactor)
+            let maxZoom = min(5.0, device.maxAvailableVideoZoomFactor)
+            let zoom = min(max(factor, minZoom), maxZoom)
             device.videoZoomFactor = zoom
             device.unlockForConfiguration()
             
+            self.currentZoomFactor = zoom
+            
             DispatchQueue.main.async {
-                self.zoomSlider.value = Float(zoom)
+                let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0, 3.0]
+                var closestIndex = 1
+                var minDiff = CGFloat.greatestFiniteMagnitude
+                for (index, level) in zoomLevels.enumerated() {
+                    let diff = abs(level - zoom)
+                    if diff < minDiff {
+                        minDiff = diff
+                        closestIndex = index
+                    }
+                }
+                
+                for (index, view) in self.zoomStackView.arrangedSubviews.enumerated() {
+                    if let btn = view as? UIButton {
+                        btn.tintColor = (index == closestIndex) ? .systemYellow : .white
+                    }
+                }
             }
         } catch { print(error) }
-    }
-    
-    func showZoomSlider() {
-        UIView.animate(withDuration: 0.3) { self.zoomSlider.alpha = 1.0 }
-    }
-    
-    func hideZoomSlider() {
-        UIView.animate(withDuration: 0.3) { self.zoomSlider.alpha = 0.0 }
     }
     
     func feedbackGenerator() {

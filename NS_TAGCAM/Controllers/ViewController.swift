@@ -139,15 +139,7 @@ class ViewController: UIViewController {
         return button
     }()
     
-    let logoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "nsra")
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.alpha = 0.5
-        return imageView
-    }()
-    
+
     let gridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -155,16 +147,18 @@ class ViewController: UIViewController {
         return view
     }()
     
-    let zoomSlider: UISlider = {
-        let slider = UISlider()
-        slider.minimumValue = 1.0
-        slider.maximumValue = 5.0
-        slider.value = 1.0
-        slider.minimumTrackTintColor = .systemYellow
-        slider.maximumTrackTintColor = UIColor.white.withAlphaComponent(0.3)
-        slider.translatesAutoresizingMaskIntoConstraints = false
-        slider.alpha = 0 // Hidden initially
-        return slider
+    let zoomStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 20
+        stack.distribution = .equalSpacing
+        stack.alignment = .center
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        stack.layer.cornerRadius = 22
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.layoutMargins = UIEdgeInsets(top: 8, left: 20, bottom: 8, right: 20)
+        return stack
     }()
     
     let shutterView: UIView = {

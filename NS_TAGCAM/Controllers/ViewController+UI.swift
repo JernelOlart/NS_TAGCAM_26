@@ -6,8 +6,7 @@ extension ViewController {
         view.addSubview(topBlurView)
         view.addSubview(captureButton)
         view.addSubview(imageView)
-        view.addSubview(logoImageView)
-        view.addSubview(zoomSlider)
+        view.addSubview(zoomStackView)
         view.addSubview(shutterView)
         view.addSubview(focusSquare)
         view.addSubview(advancedControlsStack)
@@ -43,11 +42,6 @@ extension ViewController {
             controlStack.trailingAnchor.constraint(equalTo: topBlurView.contentView.trailingAnchor, constant: -20),
             controlStack.centerYAnchor.constraint(equalTo: topBlurView.contentView.centerYAnchor),
             
-            logoImageView.topAnchor.constraint(equalTo: topBlurView.bottomAnchor, constant: 10),
-            logoImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            logoImageView.widthAnchor.constraint(equalToConstant: 20),
-            logoImageView.heightAnchor.constraint(equalToConstant: 20),
-            
             advancedControlsStack.topAnchor.constraint(equalTo: topBlurView.bottomAnchor, constant: 15),
             advancedControlsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             advancedControlsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -63,9 +57,9 @@ extension ViewController {
             captureButton.widthAnchor.constraint(equalToConstant: 90),
             captureButton.heightAnchor.constraint(equalToConstant: 90),
             
-            zoomSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60),
-            zoomSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60),
-            zoomSlider.bottomAnchor.constraint(equalTo: captureButton.topAnchor, constant: -40),
+            zoomStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            zoomStackView.bottomAnchor.constraint(equalTo: captureButton.topAnchor, constant: -30),
+            zoomStackView.heightAnchor.constraint(equalToConstant: 44),
             
             imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
             imageView.centerYAnchor.constraint(equalTo: captureButton.centerYAnchor),
@@ -81,10 +75,28 @@ extension ViewController {
         gridButton.addTarget(self, action: #selector(toggleGrid), for: .touchUpInside)
         flashButton.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside)
         switchCameraButton.addTarget(self, action: #selector(switchCamera), for: .touchUpInside)
-        zoomSlider.addTarget(self, action: #selector(zoomSliderChanged(_:)), for: .valueChanged)
         controlsButton.addTarget(self, action: #selector(toggleControls), for: .touchUpInside)
         isoSlider.addTarget(self, action: #selector(isoChanged(_:)), for: .valueChanged)
         exposureSlider.addTarget(self, action: #selector(exposureChanged(_:)), for: .valueChanged)
+        
+        let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0, 3.0]
+        for (index, zoom) in zoomLevels.enumerated() {
+            let button = UIButton(type: .system)
+            let title = zoom == 0.5 ? ".5" : "\(Int(zoom))"
+            button.setTitle(title, for: .normal)
+            button.titleLabel?.font = .systemFont(ofSize: 14, weight: .bold)
+            button.tintColor = index == 1 ? .systemYellow : .white
+            button.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+            button.layer.cornerRadius = 16
+            button.tag = index
+            
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.widthAnchor.constraint(equalToConstant: 32).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 32).isActive = true
+            
+            button.addTarget(self, action: #selector(zoomButtonTapped(_:)), for: .touchUpInside)
+            zoomStackView.addArrangedSubview(button)
+        }
     }
     
     func setupGestures() {
