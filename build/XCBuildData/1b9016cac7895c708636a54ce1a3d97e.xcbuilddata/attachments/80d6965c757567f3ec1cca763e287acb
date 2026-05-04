@@ -1,0 +1,41 @@
+{
+  "" : {
+    "const-values" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary.swiftconstvalues",
+    "dependencies" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary.d",
+    "diagnostics" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary.dia",
+    "emit-module-dependencies" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary-emit-module.dia",
+    "pch" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary.swiftdeps"
+  },
+  "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/AppDelegate.swift" : {
+    "index-unit-output-path" : "/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/AppDelegate.o"
+  },
+  "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/GridView.swift" : {
+    "index-unit-output-path" : "/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/GridView.o",
+    "llvm-bc" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/GridView.bc",
+    "object" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/GridView.o"
+  },
+  "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/NS_TAGCAMApp.swift" : {
+    "index-unit-output-path" : "/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAMApp.o",
+    "llvm-bc" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAMApp.bc",
+    "object" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAMApp.o"
+  },
+  "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/SceneDelegate.swift" : {
+    "index-unit-output-path" : "/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/SceneDelegate.o",
+    "llvm-bc" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/SceneDelegate.bc",
+    "object" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/SceneDelegate.o"
+  },
+  "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/ViewController.swift" : {
+    "index-unit-output-path" : "/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/ViewController.o",
+    "llvm-bc" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/ViewController.bc",
+    "object" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/ViewController.o"
+  },
+  "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/build/NS_TAGCAM.build/Release-iphoneos/NS_TAGCAM.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

@@ -1,0 +1,250 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -project NS_TAGCAM.xcodeproj -scheme NS_TAGCAM -destination "platform=iOS Simulator,name=iPhone 17"
+
+2026-05-04 15:44:37.794 xcodebuild[7918:55265] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'NS_TAGCAM' in project 'NS_TAGCAM' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: b2da3c1092bd8910e7a0ab118731965e
+Build description path: /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/XCBuildData/b2da3c1092bd8910e7a0ab118731965e.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk /Users/jernelolart/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E252-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -o /Users/jernelolart/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E252-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache
+
+CompileAssetCatalogVariant thinned /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator/NS_TAGCAM.app /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Assets.xcassets (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Assets.xcassets --compile /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --filter-for-thinning-device-configuration iPhone18,3 --filter-for-device-os-version 26.4.1 --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 26.4 --platform iphonesimulator
+
+SwiftDriver NS_TAGCAM normal arm64 com.apple.xcode.tools.swift.compiler (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name NS_TAGCAM -Onone @/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -target arm64-apple-ios26.4-simulator -g -module-cache-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator -F /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/jernelolart/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E252-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache -output-file-map /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM_const_extract_protocols.json -Xcc -iquote -Xcc /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-generated-files.hmap -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-own-target-headers.hmap -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-all-target-headers.hmap -Xcc -iquote -Xcc /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-project-headers.hmap -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources-normal/arm64 -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources/arm64 -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-Swift.h -working-directory /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_float-4CL9OT8J82Y6BZ5N1H7I0K7NG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_AvailabilityInternal-ODI4RERO6JF4JYFJK2G8GM08.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_stddef-5177NWMN33TGLJNSDGKCVUBLA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/ptrcheck-CM1PLK3SF7BAVHQY4FNGIFVK1.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_SwiftConcurrencyShims-B1ZSQ4FMEBFWJD2O8332WEW1U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_stdbool-F4RLX9HRVV0YILQEBX3EDXA1D.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_stdarg-A6RUFYFW2EOSXYJJHFPUPGIKJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/DeveloperToolsSupport-118VZG0ZGBKYSOP4B2N8GBBV8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/ptrauth-4RJZS00VE1VIDDY3ARJQNDKGI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/SwiftShims-7DRPJPKA7XYTM7IRXVWWYVGEE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_DarwinFoundation1-CR1R18C7G4X8B83K85M57O2S9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_DarwinFoundation2-DI9JX1KNIFJW2069TRSBY7JML.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_limits-5KSQ6SL0RDTM19MXCKK4QRMTT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_stdint-3SY4JNNXI3F7K2EOI6N1AQN9K.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_tgmath-AM72SPX46Q01ENBWMB81YIDVY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/sys_types-EVTX8KF5YCUSMDPPD5CA6O2OL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_DarwinFoundation3-9LMD110QIOI02HTCFYLTQS74E.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_intrinsics-DVNT3LIDSWXQSWTSN7B1DGZS.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_stdatomic-KOVNAL6OFHHLXQABRXN772FF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_Builtin_inttypes-XNQOLLVUD96Z7GR2983M5EM2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Darwin-9LQO7XL05Y41RKEM4ELR6TY2S.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/simd-AFPW99LP9P84HG602ZEGXMXWW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/MachO-135S0FN1FLNDCPXRUQIQHZHQ1.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/ObjectiveC-9U2ZL4OYPZ8C03LFHRWSW4FJS.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Spatial-YQVZT8VU4HU19RKGOIA70WS8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/os_object-CCW1GF5J2QP24QCX8OVJA3ZK9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/os_workgroup-5STY2YKDFGKOABGWJ6108QV6W.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Dispatch-1J17IATZIV7WZRAZEPUYGSAOE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreFoundation-30ONP3HCSKRN13HBXENXV4P5Q.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/dnssd-E6PNB8RHN5UFQOMNABM2WIO77.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/XPC-4LSWU2V5QTI2HKSUD2FII373U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/os-CBPCUB3YV7674OA9BFAV8ET52.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreGraphics-C7RWUM3NVODKFT35U0RBHEP1V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Security-76FS2LIQA631L5VO4DMKROZLW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreAudioTypes-8JE229A4G8BE94AA3DCSSFAWR.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CFNetwork-PH1Q47FP3K1F1YY5YKAI401B.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreAudio-4ARZ37D75EF55C85JB1FH13FV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Foundation-9D6IJYJ1LQPDPJMF0HZM54QZL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreText-BHYVKG1KPMGIYGUO6YRYFZ5E7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/ImageIO-BRQSC4F8X0VUICA76PN3JI5LI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/DataDetection-372GLGXTRIHH6BFXDBPWN34TF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/IOSurface-D39ON7DUTKF2ECRFA706X1P0A.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/UIUtilities-9AGBCXY2N8SOPU8SHWS8XOR5U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Symbols-2ID42SJQPD426T0HAZ8IP79CG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/OSLog-DMHP7XMKWHIB7M9RRCC5WC9GY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreMIDI-69NNYKBWQ8FRL80TOYOGQNAUE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/UniformTypeIdentifiers-77I7W9JK322GSU96LWJ6B5N71.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Accessibility-3OC71HMQQ9YGJVQH10QA09W5V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/OpenGLES-2LEVU2TZ3PRQUJC28VP18UFJ4.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/_LocationEssentials-C21DH37GMY6CJDMPLICEMKFOR.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreData-IEA96HO17OA7R2UDVWMVFRZW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Network-MOXRLHBVQ3KOPCRYXUA9E6LZ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreTransferable-78BQ815N45NSWAKUBB33SHJFL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/UserNotifications-D2ZNSQYWFMR52I7B512SOES6F.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/AudioToolbox-5NFPWGKKR402CKS0PIGOIX937.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreLocation-6KIWUFJUA6AMFRIEQ7HMZBM8L.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/FileProvider-1ZSDYAEY3B37GID5C5MCY17QE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Metal-10JS6PWOZR6KS1FLN06KP5W7C.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/AVRouting-3F89GG1LNPJI2QGG9NSHNALB7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreMotion-CVVGIDHV07305M6CCCZLHLUOW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreVideo-50BJY5U9D6LEGE7HP5FZETYUP.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/QuartzCore-BN5LO1ZALP7XE328C7CRIHF7W.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreImage-DMDKD047AIO67FOIREA8SZQ50.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/CoreMedia-3ESFR6MBLB2Y8L2FQ4DJKFSYX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/SwiftUICore-4W8GJ25GBKWDZW7R2RX3SYGQ0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/AVFAudio-7P7B0ITHXHT7MI4M6P1GZSWZZ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/MediaToolbox-SYD0X20Q7E90KWRFJLB5WMHJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/UIKit-25PXZM3BRRJGMR3RNK2G1S60Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/AVFoundation-3Y7WU2J8SXJK01HZD2LGB3TZJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/SwiftUI-7Q91658OMI3P68P2S7J7TFTCG.pcm
+
+SwiftCompile normal arm64 Compiling\ ViewController+Motion.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Motion.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+SwiftCompile normal arm64 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Motion.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+SwiftCompile normal arm64 Compiling\ SceneDelegate.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/SceneDelegate.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+
+SwiftCompile normal arm64 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/SceneDelegate.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ NS_TAGCAM (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -emit-module -experimental-skip-non-inlinable-function-bodies-without-types /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Actions.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Camera.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Location.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Motion.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+UI.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/AppDelegate.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/GridView.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/SceneDelegate.swift /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources/GeneratedAssetSymbols.swift -target arm64-apple-ios26.4-simulator -module-can-import-version DeveloperToolsSupport 23.40.26 23.40.26 -module-can-import-version SwiftUI 7.4.27.1 7.4.27 -module-can-import-version UIKit 9126.4.27.1 9126.4.27 -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.4.sdk -I /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator -F /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=5 -module-cache-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM_const_extract_protocols.json -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -default-isolation\=MainActor -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/jernelolart/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM -enable-anonymous-context-mangled-names -file-compilation-dir /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/jernelolart/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.4-23E252-686eebb5dc1d8ecb277353a59184f4aa.sdkstatcache -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-generated-files.hmap -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-own-target-headers.hmap -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-all-target-headers.hmap -Xcc -iquote -Xcc /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/NS_TAGCAM-project-headers.hmap -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources-normal/arm64 -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources/arm64 -Xcc -I/Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name NS_TAGCAM -frontend-parseable-output -disable-clang-spi -clang-target arm64-apple-ios26.4-simulator -target-sdk-version 26.4 -target-sdk-name iphonesimulator26.4 -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -emit-module-doc-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM.swiftdoc -emit-module-source-info-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM.swiftsourceinfo -emit-objc-header-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-Swift.h -serialize-diagnostics-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary-emit-module.dia -emit-dependencies-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM-primary-emit-module.d -o /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM.swiftmodule -emit-abi-descriptor-path /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/Objects-normal/arm64/NS_TAGCAM.abi.json
+
+EmitSwiftModule normal arm64 (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController.swift:20:20: warning: 'CLGeocoder' was deprecated in iOS 26.0: Use MapKit
+    let geocoder = CLGeocoder()
+                   ^
+/Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4 Programacion-Proyects/1 Codigos Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Camera.swift:98:49: error: cannot find type 'CoreLocation' in scope
+    func addWatermark(image: UIImage, location: CoreLocation.CLLocation) -> UIImage {
+                                                ^~~~~~~~~~~~
+
+SwiftCompile normal arm64 Compiling\ GeneratedAssetSymbols.swift /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+
+SwiftCompile normal arm64 /Users/jernelolart/Library/Developer/Xcode/DerivedData/NS_TAGCAM-dskdirepnznscvhbmgyzondxvvch/Build/Intermediates.noindex/NS_TAGCAM.build/Debug-iphonesimulator/NS_TAGCAM.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+SwiftCompile normal arm64 Compiling\ ViewController.swift,\ ViewController+Actions.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Actions.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+
+SwiftCompile normal arm64 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+SwiftCompile normal arm64 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+Actions.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+SwiftCompile normal arm64 Compiling\ AppDelegate.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/AppDelegate.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+
+SwiftCompile normal arm64 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/AppDelegate.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+SwiftCompile normal arm64 Compiling\ ViewController+UI.swift /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+UI.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+
+SwiftCompile normal arm64 /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM/NS_TAGCAM/Controllers/ViewController+UI.swift (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+    cd /Users/jernelolart/Library/CloudStorage/OneDrive-Personal/4\ Programacion-Proyects/1\ Codigos\ Fuentes/NS_TAGCAM_26/NS_TAGCAM
+    
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftEmitModule normal arm64 Emitting\ module\ for\ NS_TAGCAM (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+	EmitSwiftModule normal arm64 (in target 'NS_TAGCAM' from project 'NS_TAGCAM')
+	Building project NS_TAGCAM with scheme NS_TAGCAM
+(3 failures)

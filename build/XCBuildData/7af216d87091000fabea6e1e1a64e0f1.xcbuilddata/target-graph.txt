@@ -1,0 +1,2 @@
+Target dependency graph (1 target)
+Target 'NS_TAGCAM' in project 'NS_TAGCAM' (no dependencies)

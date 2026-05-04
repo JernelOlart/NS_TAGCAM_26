@@ -1,0 +1,217 @@
+import UIKit
+import AVFoundation
+import CoreLocation
+import CoreMotion
+
+class ViewController: UIViewController {
+    
+    // MARK: - Properties
+    var captureSession: AVCaptureSession!
+    var photoOutput: AVCapturePhotoOutput!
+    var previewLayer: AVCaptureVideoPreviewLayer!
+    var locationManager: CLLocationManager!
+    var currentLocation: CLLocation?
+    var address: String = "Cargando dirección..."
+
+    let motionManager = CMMotionManager()
+    var physicalOrientation: UIDeviceOrientation = .portrait
+
+    var previewTimer: Timer?
+    let geocoder = CLGeocoder()
+    
+    // Session Management
+    let sessionQueue = DispatchQueue(label: "session queue")
+    var videoDeviceInput: AVCaptureDeviceInput!
+    
+    // UI State
+    var isGridVisible = false
+    var flashMode: AVCaptureDevice.FlashMode = .auto
+    var currentZoomFactor: CGFloat = 1.0
+    var isControlsVisible = false
+    
+    // MARK: - UI Components
+    let controlsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let advancedControlsStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 20
+        stack.distribution = .fillEqually
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.isHidden = true
+        stack.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        stack.layer.cornerRadius = 10
+        stack.isLayoutMarginsRelativeArrangement = true
+        stack.layoutMargins = UIEdgeInsets(top: 10, left: 15, bottom: 10, right: 15)
+        return stack
+    }()
+    
+    let isoSlider: UISlider = {
+        let slider = UISlider()
+        slider.minimumTrackTintColor = .systemOrange
+        slider.maximumTrackTintColor = UIColor.white.withAlphaComponent(0.3)
+        return slider
+    }()
+    
+    let exposureSlider: UISlider = {
+        let slider = UISlider()
+        slider.minimumTrackTintColor = .systemYellow
+        slider.maximumTrackTintColor = UIColor.white.withAlphaComponent(0.3)
+        return slider
+    }()
+    
+    let focusSquare: UIView = {
+        let view = UIView()
+        view.layer.borderColor = UIColor.systemYellow.cgColor
+        view.layer.borderWidth = 1.5
+        view.backgroundColor = .clear
+        view.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        view.alpha = 0
+        return view
+    }()
+    
+    let topBlurView: UIVisualEffectView = {
+        let blur = UIBlurEffect(style: .systemThinMaterialDark)
+        let view = UIVisualEffectView(effect: blur)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 20
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    let captureButton: UIButton = {
+        let button = UIButton(type: .custom)
+        let config = UIImage.SymbolConfiguration(pointSize: 60, weight: .thin)
+        button.setImage(UIImage(systemName: "circle.inset.filled", withConfiguration: config), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isHidden = true
+        imageView.layer.cornerRadius = 12
+        imageView.clipsToBounds = true
+        imageView.backgroundColor = .black
+        imageView.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        imageView.layer.borderWidth = 1.5
+        return imageView
+    }()
+    
+    let infoButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "info.circle.fill"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let gridButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "grid"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let flashButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "bolt.badge.a.fill"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let switchCameraButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "camera.rotate.fill"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "nsra")
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.alpha = 0.5
+        return imageView
+    }()
+    
+    let gridView: GridView = {
+        let view = GridView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
+        return view
+    }()
+    
+    let zoomSlider: UISlider = {
+        let slider = UISlider()
+        slider.minimumValue = 1.0
+        slider.maximumValue = 5.0
+        slider.value = 1.0
+        slider.minimumTrackTintColor = .systemYellow
+        slider.maximumTrackTintColor = UIColor.white.withAlphaComponent(0.3)
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.alpha = 0 // Hidden initially
+        return slider
+    }()
+    
+    let shutterView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.alpha = 0
+        view.isUserInteractionEnabled = false
+        return view
+    }()
+    
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .black
+        setupLocationManager()
+        setupCamera()
+        setupUI()
+        setupGestures()
+        setupMotionManager()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        sessionQueue.async {
+            if !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        sessionQueue.async {
+            if self.captureSession.isRunning {
+                self.captureSession.stopRunning()
+            }
+        }
+        
+        if motionManager.isDeviceMotionActive {
+            motionManager.stopDeviceMotionUpdates()
+        }
+        super.viewWillDisappear(animated)
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        previewLayer?.frame = view.layer.bounds
+        shutterView.frame = view.bounds
+        updatePreviewLayerOrientation()
+    }
+}
