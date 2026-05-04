@@ -22,8 +22,15 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         photoOutput = AVCapturePhotoOutput()
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
+            if #available(iOS 13.0, *) {
+                photoOutput.maxPhotoQualityPrioritization = .quality
+            }
             if #available(iOS 16.0, *) {
-                // In iOS 16+, high resolution is controlled via maxPhotoDimensions on settings
+                if let maxDimensions = videoDevice.activeFormat.supportedMaxPhotoDimensions.max(by: {
+                    Int($0.width) * Int($0.height) < Int($1.width) * Int($1.height)
+                }) {
+                    photoOutput.maxPhotoDimensions = maxDimensions
+                }
             } else {
                 photoOutput.isHighResolutionCaptureEnabled = true
             }
@@ -52,28 +59,24 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         
         sessionQueue.async {
             guard let connection = self.photoOutput.connection(with: .video) else { return }
-            
-            let captureOrientation: AVCaptureVideoOrientation
-            switch self.physicalOrientation {
-            case .landscapeLeft: captureOrientation = .landscapeRight
-            case .landscapeRight: captureOrientation = .landscapeLeft
-            case .portraitUpsideDown: captureOrientation = .portraitUpsideDown
-            default: captureOrientation = .portrait
-            }
-            
+
             if #available(iOS 17.0, *) {
-                let rotationAngle: CGFloat
-                switch captureOrientation {
-                case .portrait: rotationAngle = 90
-                case .portraitUpsideDown: rotationAngle = 270
-                case .landscapeRight: rotationAngle = 0
-                case .landscapeLeft: rotationAngle = 180
-                @unknown default: rotationAngle = 90
-                }
+                let rotationCoordinator = AVCaptureDevice.RotationCoordinator(
+                    device: self.videoDeviceInput.device,
+                    previewLayer: self.previewLayer
+                )
+                let rotationAngle = rotationCoordinator.videoRotationAngleForHorizonLevelCapture
                 if connection.isVideoRotationAngleSupported(rotationAngle) {
                     connection.videoRotationAngle = rotationAngle
                 }
             } else {
+                let captureOrientation: AVCaptureVideoOrientation
+                switch self.physicalOrientation {
+                case .landscapeLeft: captureOrientation = .landscapeRight
+                case .landscapeRight: captureOrientation = .landscapeLeft
+                case .portraitUpsideDown: captureOrientation = .portraitUpsideDown
+                default: captureOrientation = .portrait
+                }
                 if connection.isVideoOrientationSupported {
                     connection.videoOrientation = captureOrientation
                 }
@@ -82,14 +85,12 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             photoSettings.flashMode = self.flashMode
             
             if #available(iOS 16.0, *) {
-                if let maxDimensions = self.photoOutput.constituentDevicePhotoDimensions.first(where: { $0.width > 0 }) {
-                    photoSettings.maxPhotoDimensions = maxDimensions
-                }
+                photoSettings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
             } else {
                 photoSettings.isHighResolutionPhotoEnabled = true
             }
             if #available(iOS 13.0, *) {
-                photoSettings.photoQualityPrioritization = .quality
+                photoSettings.photoQualityPrioritization = self.photoOutput.maxPhotoQualityPrioritization
             }
             self.photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
