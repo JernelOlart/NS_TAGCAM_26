@@ -60,26 +60,9 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         sessionQueue.async {
             guard let connection = self.photoOutput.connection(with: .video) else { return }
 
-            if #available(iOS 17.0, *) {
-                let rotationCoordinator = AVCaptureDevice.RotationCoordinator(
-                    device: self.videoDeviceInput.device,
-                    previewLayer: self.previewLayer
-                )
-                let rotationAngle = rotationCoordinator.videoRotationAngleForHorizonLevelCapture
-                if connection.isVideoRotationAngleSupported(rotationAngle) {
-                    connection.videoRotationAngle = rotationAngle
-                }
-            } else {
-                let captureOrientation: AVCaptureVideoOrientation
-                switch self.physicalOrientation {
-                case .landscapeLeft: captureOrientation = .landscapeRight
-                case .landscapeRight: captureOrientation = .landscapeLeft
-                case .portraitUpsideDown: captureOrientation = .portraitUpsideDown
-                default: captureOrientation = .portrait
-                }
-                if connection.isVideoOrientationSupported {
-                    connection.videoOrientation = captureOrientation
-                }
+            let rotationAngle = self.currentVideoRotationAngle()
+            if connection.isVideoRotationAngleSupported(rotationAngle) {
+                connection.videoRotationAngle = rotationAngle
             }
             let photoSettings = AVCapturePhotoSettings()
             photoSettings.flashMode = self.flashMode

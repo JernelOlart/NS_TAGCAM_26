@@ -39,6 +39,19 @@ extension ViewController {
     }
     
     func updateUIForPhysicalOrientation() {
+        UIView.animate(withDuration: 0.3) {
+            let transform = self.controlRotationTransform()
+            self.switchCameraButton.transform = transform
+            self.flashButton.transform = transform
+            self.gridButton.transform = transform
+            self.controlsButton.transform = transform
+            self.infoButton.transform = transform
+        }
+
+        updatePreviewLayerOrientation()
+    }
+
+    func controlRotationTransform(scale: CGFloat = 1.0) -> CGAffineTransform {
         let angle: CGFloat
         switch physicalOrientation {
         case .landscapeLeft: angle = .pi / 2
@@ -46,42 +59,25 @@ extension ViewController {
         case .portraitUpsideDown: angle = .pi
         default: angle = 0
         }
-        
-        UIView.animate(withDuration: 0.3) {
-            let transform = CGAffineTransform(rotationAngle: angle)
-            self.switchCameraButton.transform = transform
-            self.flashButton.transform = transform
-            self.gridButton.transform = transform
-            self.controlsButton.transform = transform
-            self.infoButton.transform = transform
+
+        return CGAffineTransform(rotationAngle: angle).scaledBy(x: scale, y: scale)
+    }
+
+    func currentVideoRotationAngle() -> CGFloat {
+        switch physicalOrientation {
+        case .portrait: return 90
+        case .landscapeLeft: return 0
+        case .landscapeRight: return 180
+        case .portraitUpsideDown: return 270
+        default: return 90
         }
     }
-    
+
     func updatePreviewLayerOrientation() {
         guard let connection = previewLayer?.connection else { return }
-        let orientation = UIDevice.current.orientation
-        if orientation.isValidInterfaceOrientation {
-            if #available(iOS 17.0, *) {
-                let rotationAngle: CGFloat
-                switch orientation {
-                case .portrait: rotationAngle = 90
-                case .landscapeLeft: rotationAngle = 0 // Swapped to match AVCaptureVideoOrientation.landscapeRight
-                case .landscapeRight: rotationAngle = 180 // Swapped to match AVCaptureVideoOrientation.landscapeLeft
-                case .portraitUpsideDown: rotationAngle = 270
-                default: rotationAngle = 90
-                }
-                if connection.isVideoRotationAngleSupported(rotationAngle) {
-                    connection.videoRotationAngle = rotationAngle
-                }
-            } else {
-                switch orientation {
-                case .portrait: connection.videoOrientation = .portrait
-                case .landscapeLeft: connection.videoOrientation = .landscapeRight
-                case .landscapeRight: connection.videoOrientation = .landscapeLeft
-                case .portraitUpsideDown: connection.videoOrientation = .portraitUpsideDown
-                default: connection.videoOrientation = .portrait
-                }
-            }
+        let rotationAngle = currentVideoRotationAngle()
+        if connection.isVideoRotationAngleSupported(rotationAngle) {
+            connection.videoRotationAngle = rotationAngle
         }
     }
 }

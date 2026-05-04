@@ -93,14 +93,26 @@ extension ViewController {
     
     @objc func buttonTouchDown(_ sender: UIButton) {
         UIView.animate(withDuration: 0.1) {
-            sender.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+            sender.transform = self.transformForButtonPress(sender, scale: 0.85)
         }
     }
     
     @objc func buttonTouchUp(_ sender: UIButton) {
         UIView.animate(withDuration: 0.1) {
-            sender.transform = .identity
+            sender.transform = self.transformForButtonPress(sender, scale: 1.0)
         }
+    }
+
+    func transformForButtonPress(_ button: UIButton, scale: CGFloat) -> CGAffineTransform {
+        let isRotatingControl = button == switchCameraButton
+            || button == flashButton
+            || button == gridButton
+            || button == controlsButton
+            || button == infoButton
+
+        return isRotatingControl
+            ? controlRotationTransform(scale: scale)
+            : CGAffineTransform(scaleX: scale, y: scale)
     }
     
     @objc func toggleGrid() {

@@ -17,8 +17,6 @@ class ViewController: UIViewController {
     var physicalOrientation: UIDeviceOrientation = .portrait
 
     var previewTimer: Timer?
-    let geocoder = CLGeocoder()
-    
     // Session Management
     let sessionQueue = DispatchQueue(label: "session queue")
     var videoDeviceInput: AVCaptureDeviceInput!
@@ -232,5 +230,21 @@ class ViewController: UIViewController {
         previewLayer?.frame = view.layer.bounds
         shutterView.frame = view.bounds
         updatePreviewLayerOrientation()
+    }
+
+    override var shouldAutorotate: Bool {
+        true
+    }
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { _ in
+            self.previewLayer?.frame = self.view.bounds
+            self.updatePreviewLayerOrientation()
+        })
     }
 }
