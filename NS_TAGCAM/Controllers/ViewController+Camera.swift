@@ -109,26 +109,50 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         Dirección: \(address)
         """
         
-        let fontSize: CGFloat = image.size.width * 0.025
+        // Calculate dynamic sizes based on the smaller dimension to ensure consistency
+        let minDimension = min(image.size.width, image.size.height)
+        let fontSize: CGFloat = minDimension * 0.03
+        let textPadding: CGFloat = minDimension * 0.04
+        
         let textAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.boldSystemFont(ofSize: fontSize),
-            .foregroundColor: UIColor.white,
-            .backgroundColor: UIColor.black.withAlphaComponent(0.4)
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .semibold),
+            .foregroundColor: UIColor.white
         ]
         
         UIGraphicsBeginImageContextWithOptions(image.size, false, 1.0)
         image.draw(in: CGRect(origin: .zero, size: image.size))
         
-        let textPadding: CGFloat = image.size.width * 0.03
-        let textHeight: CGFloat = image.size.height * 0.15
-        let textRect = CGRect(x: textPadding, y: image.size.height - textHeight - textPadding, width: image.size.width - 2 * textPadding, height: textHeight)
+        // Calculate required text height dynamically
+        let maxWidth = image.size.width - (textPadding * 2)
+        let attributedString = NSAttributedString(string: watermarkText, attributes: textAttributes)
+        let textBoundingRect = attributedString.boundingRect(
+            with: CGSize(width: maxWidth, height: image.size.height),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            context: nil
+        )
         
-        watermarkText.draw(in: textRect, withAttributes: textAttributes)
+        let backgroundHeight = textBoundingRect.height + (textPadding * 2)
+        let backgroundRect = CGRect(x: 0, y: image.size.height - backgroundHeight, width: image.size.width, height: backgroundHeight)
         
+        // Draw semi-transparent background for better readability
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(UIColor.black.withAlphaComponent(0.5).cgColor)
+        context?.fill(backgroundRect)
+        
+        // Draw the text inside the background
+        let textDrawingRect = CGRect(
+            x: textPadding,
+            y: image.size.height - backgroundHeight + textPadding,
+            width: maxWidth,
+            height: textBoundingRect.height
+        )
+        watermarkText.draw(in: textDrawingRect, withAttributes: textAttributes)
+        
+        // Draw logo as a watermark in the corner
         if let logo = UIImage(named: "nsra") {
-            let logoSize: CGFloat = image.size.width * 0.12
+            let logoSize: CGFloat = minDimension * 0.12
             let logoRect = CGRect(x: image.size.width - logoSize - textPadding, y: textPadding, width: logoSize, height: logoSize)
-            logo.draw(in: logoRect, blendMode: .normal, alpha: 0.9)
+            logo.draw(in: logoRect, blendMode: .normal, alpha: 0.8)
         }
         
         let result = UIGraphicsGetImageFromCurrentImageContext()

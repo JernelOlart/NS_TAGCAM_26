@@ -24,7 +24,7 @@ extension ViewController {
         advancedControlsStack.addArrangedSubview(isoStack)
         advancedControlsStack.addArrangedSubview(expStack)
         
-        let controlStack = UIStackView(arrangedSubviews: [flashButton, gridButton, switchCameraButton, controlsButton, infoButton])
+        let controlStack = UIStackView(arrangedSubviews: [logoImageView, flashButton, gridButton, switchCameraButton, controlsButton, infoButton])
         controlStack.axis = .horizontal
         controlStack.distribution = .equalSpacing
         controlStack.alignment = .center
@@ -33,6 +33,9 @@ extension ViewController {
         topBlurView.contentView.addSubview(controlStack)
         
         NSLayoutConstraint.activate([
+            logoImageView.widthAnchor.constraint(equalToConstant: 30),
+            logoImageView.heightAnchor.constraint(equalToConstant: 30),
+            
             topBlurView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             topBlurView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             topBlurView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, constant: -40),

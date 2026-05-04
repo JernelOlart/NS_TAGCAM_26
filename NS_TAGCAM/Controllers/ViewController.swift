@@ -139,7 +139,12 @@ class ViewController: UIViewController {
         return button
     }()
     
-
+    let logoImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "nsra"))
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
     let gridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
