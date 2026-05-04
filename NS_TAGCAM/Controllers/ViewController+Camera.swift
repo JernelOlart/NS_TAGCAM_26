@@ -22,7 +22,11 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         photoOutput = AVCapturePhotoOutput()
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
-            photoOutput.isHighResolutionCaptureEnabled = true
+            if #available(iOS 16.0, *) {
+                // In iOS 16+, high resolution is controlled via maxPhotoDimensions on settings
+            } else {
+                photoOutput.isHighResolutionCaptureEnabled = true
+            }
         }
         
         captureSession.commitConfiguration()
@@ -48,19 +52,42 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         
         sessionQueue.async {
             guard let connection = self.photoOutput.connection(with: .video) else { return }
-            if connection.isVideoOrientationSupported {
-                let captureOrientation: AVCaptureVideoOrientation
-                switch self.physicalOrientation {
-                case .landscapeLeft: captureOrientation = .landscapeRight
-                case .landscapeRight: captureOrientation = .landscapeLeft
-                case .portraitUpsideDown: captureOrientation = .portraitUpsideDown
-                default: captureOrientation = .portrait
+            
+            let captureOrientation: AVCaptureVideoOrientation
+            switch self.physicalOrientation {
+            case .landscapeLeft: captureOrientation = .landscapeRight
+            case .landscapeRight: captureOrientation = .landscapeLeft
+            case .portraitUpsideDown: captureOrientation = .portraitUpsideDown
+            default: captureOrientation = .portrait
+            }
+            
+            if #available(iOS 17.0, *) {
+                let rotationAngle: CGFloat
+                switch captureOrientation {
+                case .portrait: rotationAngle = 90
+                case .portraitUpsideDown: rotationAngle = 270
+                case .landscapeRight: rotationAngle = 0
+                case .landscapeLeft: rotationAngle = 180
+                @unknown default: rotationAngle = 90
                 }
-                connection.videoOrientation = captureOrientation
+                if connection.isVideoRotationAngleSupported(rotationAngle) {
+                    connection.videoRotationAngle = rotationAngle
+                }
+            } else {
+                if connection.isVideoOrientationSupported {
+                    connection.videoOrientation = captureOrientation
+                }
             }
             let photoSettings = AVCapturePhotoSettings()
             photoSettings.flashMode = self.flashMode
-            photoSettings.isHighResolutionPhotoEnabled = true
+            
+            if #available(iOS 16.0, *) {
+                if let maxDimensions = self.photoOutput.constituentDevicePhotoDimensions.first(where: { $0.width > 0 }) {
+                    photoSettings.maxPhotoDimensions = maxDimensions
+                }
+            } else {
+                photoSettings.isHighResolutionPhotoEnabled = true
+            }
             if #available(iOS 13.0, *) {
                 photoSettings.photoQualityPrioritization = .quality
             }
@@ -68,42 +95,47 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         }
     }
     
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+    nonisolated func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error { print(error); return }
         guard let imageData = photo.fileDataRepresentation(), let image = UIImage(data: imageData) else { return }
         
-        DispatchQueue.global(qos: .userInitiated).async {
-            // we safely unwrap current location or use a default
+        Task { @MainActor in
             let location = self.currentLocation ?? CoreLocation.CLLocation()
-            let croppedImage = self.cropToAspectRatio(image: image, aspectRatio: self.currentAspectRatio)
-            let watermarkedImage = self.addWatermark(image: croppedImage, location: location)
+            let aspectRatio = self.currentAspectRatio
+            let addressText = self.address
             
-            DispatchQueue.main.async {
-                self.imageView.image = watermarkedImage
-                self.imageView.isHidden = false
-                self.imageView.alpha = 0
-                self.imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            // Process watermark in background to avoid blocking main thread
+            DispatchQueue.global(qos: .userInitiated).async {
+                let croppedImage = self.cropToAspectRatio(image: image, aspectRatio: aspectRatio)
+                let watermarkedImage = self.addWatermark(image: croppedImage, location: location, address: addressText)
                 
-                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
-                    self.imageView.alpha = 1
-                    self.imageView.transform = .identity
-                })
-                
-                self.previewTimer?.invalidate()
-                self.previewTimer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
-                    UIView.animate(withDuration: 0.5, animations: {
-                        self.imageView.alpha = 0
-                        self.imageView.transform = CGAffineTransform(translationX: -100, y: 0)
-                    }) { _ in
-                        self.imageView.isHidden = true
+                DispatchQueue.main.async {
+                    self.imageView.image = watermarkedImage
+                    self.imageView.isHidden = false
+                    self.imageView.alpha = 0
+                    self.imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                    
+                    UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
+                        self.imageView.alpha = 1
+                        self.imageView.transform = .identity
+                    })
+                    
+                    self.previewTimer?.invalidate()
+                    self.previewTimer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
+                        UIView.animate(withDuration: 0.5, animations: {
+                            self.imageView.alpha = 0
+                            self.imageView.transform = CGAffineTransform(translationX: -100, y: 0)
+                        }) { _ in
+                            self.imageView.isHidden = true
+                        }
                     }
+                    UIImageWriteToSavedPhotosAlbum(watermarkedImage, nil, nil, nil)
                 }
-                UIImageWriteToSavedPhotosAlbum(watermarkedImage, nil, nil, nil)
             }
         }
     }
     
-    func addWatermark(image: UIImage, location: CoreLocation.CLLocation) -> UIImage {
+    nonisolated func addWatermark(image: UIImage, location: CoreLocation.CLLocation, address: String) -> UIImage {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
@@ -167,7 +199,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         return result ?? image
     }
     
-    func cropToAspectRatio(image: UIImage, aspectRatio: AspectRatio) -> UIImage {
+    nonisolated func cropToAspectRatio(image: UIImage, aspectRatio: AspectRatio) -> UIImage {
         let originalSize = image.size
         let targetRatio: CGFloat
         switch aspectRatio {

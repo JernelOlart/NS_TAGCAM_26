@@ -61,12 +61,26 @@ extension ViewController {
         guard let connection = previewLayer?.connection else { return }
         let orientation = UIDevice.current.orientation
         if orientation.isValidInterfaceOrientation {
-            switch orientation {
-            case .portrait: connection.videoOrientation = .portrait
-            case .landscapeLeft: connection.videoOrientation = .landscapeRight
-            case .landscapeRight: connection.videoOrientation = .landscapeLeft
-            case .portraitUpsideDown: connection.videoOrientation = .portraitUpsideDown
-            default: connection.videoOrientation = .portrait
+            if #available(iOS 17.0, *) {
+                let rotationAngle: CGFloat
+                switch orientation {
+                case .portrait: rotationAngle = 90
+                case .landscapeLeft: rotationAngle = 0 // Swapped to match AVCaptureVideoOrientation.landscapeRight
+                case .landscapeRight: rotationAngle = 180 // Swapped to match AVCaptureVideoOrientation.landscapeLeft
+                case .portraitUpsideDown: rotationAngle = 270
+                default: rotationAngle = 90
+                }
+                if connection.isVideoRotationAngleSupported(rotationAngle) {
+                    connection.videoRotationAngle = rotationAngle
+                }
+            } else {
+                switch orientation {
+                case .portrait: connection.videoOrientation = .portrait
+                case .landscapeLeft: connection.videoOrientation = .landscapeRight
+                case .landscapeRight: connection.videoOrientation = .landscapeLeft
+                case .portraitUpsideDown: connection.videoOrientation = .portraitUpsideDown
+                default: connection.videoOrientation = .portrait
+                }
             }
         }
     }

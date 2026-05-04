@@ -77,7 +77,7 @@ Para desplegar exitosamente este repositorio, se deben declarar las intenciones 
 **NS TagCam** ha sido desarrollado bajo altos estándares de ingeniería de software para plataformas Apple.
 
 - **Desarrollador:** Ing. Elián Hernández Olarte
-- **Email de Contacto:** Jernelx7@gmail.com
+- **Email de Contacto:** jernelolart@proton.me
 - **Website Oficial:** [www.jernelsystems.com](https://www.jernelsystems.com)
 
 *Copyright © JernelSystems. All rights reserved.*
