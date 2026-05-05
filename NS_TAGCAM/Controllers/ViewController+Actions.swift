@@ -390,9 +390,15 @@ extension ViewController {
     func updateWatermarkPreview() {
         let location = currentLocation ?? CLLocation()
         let config = currentWatermarkConfiguration()
-        watermarkPreviewLabel.text = watermarkText(for: location, address: address, configuration: config)
+        watermarkPreviewTitleLabel.text = config.showsMiniMap ? "NS TagCam · Geo" : "NS TagCam"
+        watermarkPreviewLabel.attributedText = watermarkPreviewAttributedText(
+            for: location,
+            address: address,
+            configuration: config
+        )
         watermarkMapPreview.image = currentMapSnapshot
         watermarkMapPreview.isHidden = !config.showsMiniMap
+        watermarkPreviewDivider.isHidden = false
     }
 
     nonisolated func watermarkText(for location: CLLocation, address: String, configuration: WatermarkConfiguration) -> String {
@@ -421,6 +427,73 @@ extension ViewController {
         }
 
         return lines.joined(separator: "\n")
+    }
+
+    nonisolated func watermarkPreviewAttributedText(
+        for location: CLLocation,
+        address: String,
+        configuration: WatermarkConfiguration
+    ) -> NSAttributedString {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.lineSpacing = 2
+
+        let fullText = NSMutableAttributedString()
+
+        func append(_ title: String, _ value: String) {
+            if !fullText.string.isEmpty {
+                fullText.append(NSAttributedString(string: "\n"))
+            }
+
+            fullText.append(
+                NSAttributedString(
+                    string: "\(title) ",
+                    attributes: [
+                        .font: UIFont.systemFont(ofSize: 9, weight: .semibold),
+                        .foregroundColor: UIColor.white.withAlphaComponent(0.62),
+                        .paragraphStyle: paragraph
+                    ]
+                )
+            )
+            fullText.append(
+                NSAttributedString(
+                    string: value,
+                    attributes: [
+                        .font: UIFont.monospacedSystemFont(ofSize: 10, weight: .medium),
+                        .foregroundColor: UIColor.white.withAlphaComponent(0.9),
+                        .paragraphStyle: paragraph
+                    ]
+                )
+            )
+        }
+
+        if configuration.showsCoordinates {
+            append("GPS", String(format: "%.5f, %.5f", location.coordinate.latitude, location.coordinate.longitude))
+        }
+        if configuration.showsAltitude {
+            append("ALT", String(format: "%.1f m", location.altitude))
+        }
+        if configuration.showsAccuracy {
+            append("ACC", String(format: "%.1f m", location.horizontalAccuracy))
+        }
+        if configuration.showsDate {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm"
+            append("TIME", formatter.string(from: Date()))
+        }
+        if configuration.showsAddress {
+            let compactAddress = address
+                .replacingOccurrences(of: ", ", with: "\n")
+                .split(separator: "\n")
+                .prefix(2)
+                .joined(separator: " · ")
+            append("ADDR", compactAddress.isEmpty ? "Sin dirección" : compactAddress)
+        }
+
+        if fullText.string.isEmpty {
+            append("READY", "Etiqueta activa")
+        }
+
+        return fullText
     }
 
     func refreshMapSnapshot(for location: CLLocation) {

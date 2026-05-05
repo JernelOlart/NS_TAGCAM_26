@@ -246,15 +246,31 @@ class ViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 18
         view.clipsToBounds = true
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
         return view
+    }()
+    let watermarkPreviewTitleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor.white.withAlphaComponent(0.92)
+        label.font = .systemFont(ofSize: 11, weight: .semibold)
+        label.text = "NS TagCam"
+        return label
     }()
     let watermarkPreviewLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
-        label.textColor = .white
-        label.font = .monospacedSystemFont(ofSize: 11, weight: .medium)
+        label.textColor = UIColor.white.withAlphaComponent(0.86)
+        label.font = .monospacedSystemFont(ofSize: 10, weight: .medium)
         return label
+    }()
+    let watermarkPreviewDivider: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.white.withAlphaComponent(0.12)
+        return view
     }()
     let watermarkMapPreview: UIImageView = {
         let imageView = UIImageView()

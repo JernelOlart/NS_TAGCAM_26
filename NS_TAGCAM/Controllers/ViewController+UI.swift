@@ -15,6 +15,8 @@ extension ViewController: UIGestureRecognizerDelegate {
         view.addSubview(advancedControlsStack)
         view.addSubview(volumeCaptureView)
 
+        watermarkPreviewView.contentView.addSubview(watermarkPreviewTitleLabel)
+        watermarkPreviewView.contentView.addSubview(watermarkPreviewDivider)
         watermarkPreviewView.contentView.addSubview(watermarkPreviewLabel)
         watermarkPreviewView.contentView.addSubview(watermarkMapPreview)
         horizonGuideView.addSubview(horizonLineView)
@@ -110,15 +112,21 @@ extension ViewController: UIGestureRecognizerDelegate {
             watermarkPreviewView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             watermarkPreviewView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             watermarkPreviewView.bottomAnchor.constraint(equalTo: zoomStackView.topAnchor, constant: -16),
-            watermarkPreviewView.heightAnchor.constraint(greaterThanOrEqualToConstant: 96),
+            watermarkPreviewView.heightAnchor.constraint(greaterThanOrEqualToConstant: 88),
+            watermarkPreviewTitleLabel.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
+            watermarkPreviewTitleLabel.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 10),
+            watermarkPreviewDivider.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
+            watermarkPreviewDivider.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -14),
+            watermarkPreviewDivider.topAnchor.constraint(equalTo: watermarkPreviewTitleLabel.bottomAnchor, constant: 8),
+            watermarkPreviewDivider.heightAnchor.constraint(equalToConstant: 1),
             watermarkPreviewLabel.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
-            watermarkPreviewLabel.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 12),
+            watermarkPreviewLabel.topAnchor.constraint(equalTo: watermarkPreviewDivider.bottomAnchor, constant: 8),
             watermarkPreviewLabel.bottomAnchor.constraint(equalTo: watermarkPreviewView.contentView.bottomAnchor, constant: -12),
-            watermarkMapPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -12),
+            watermarkMapPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -14),
             watermarkMapPreview.centerYAnchor.constraint(equalTo: watermarkPreviewView.contentView.centerYAnchor),
-            watermarkMapPreview.widthAnchor.constraint(equalToConstant: 72),
-            watermarkMapPreview.heightAnchor.constraint(equalToConstant: 72),
-            watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -12),
+            watermarkMapPreview.widthAnchor.constraint(equalToConstant: 68),
+            watermarkMapPreview.heightAnchor.constraint(equalToConstant: 68),
+            watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -10),
 
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             imageView.centerYAnchor.constraint(equalTo: captureButton.centerYAnchor),
@@ -152,15 +160,21 @@ extension ViewController: UIGestureRecognizerDelegate {
             watermarkPreviewView.leadingAnchor.constraint(equalTo: topBlurView.trailingAnchor, constant: 16),
             watermarkPreviewView.trailingAnchor.constraint(equalTo: captureButton.leadingAnchor, constant: -20),
             watermarkPreviewView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            watermarkPreviewView.heightAnchor.constraint(greaterThanOrEqualToConstant: 96),
+            watermarkPreviewView.heightAnchor.constraint(greaterThanOrEqualToConstant: 88),
+            watermarkPreviewTitleLabel.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
+            watermarkPreviewTitleLabel.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 10),
+            watermarkPreviewDivider.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
+            watermarkPreviewDivider.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -14),
+            watermarkPreviewDivider.topAnchor.constraint(equalTo: watermarkPreviewTitleLabel.bottomAnchor, constant: 8),
+            watermarkPreviewDivider.heightAnchor.constraint(equalToConstant: 1),
             watermarkPreviewLabel.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
-            watermarkPreviewLabel.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 12),
+            watermarkPreviewLabel.topAnchor.constraint(equalTo: watermarkPreviewDivider.bottomAnchor, constant: 8),
             watermarkPreviewLabel.bottomAnchor.constraint(equalTo: watermarkPreviewView.contentView.bottomAnchor, constant: -12),
-            watermarkMapPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -12),
+            watermarkMapPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -14),
             watermarkMapPreview.centerYAnchor.constraint(equalTo: watermarkPreviewView.contentView.centerYAnchor),
-            watermarkMapPreview.widthAnchor.constraint(equalToConstant: 72),
-            watermarkMapPreview.heightAnchor.constraint(equalToConstant: 72),
-            watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -12),
+            watermarkMapPreview.widthAnchor.constraint(equalToConstant: 68),
+            watermarkMapPreview.heightAnchor.constraint(equalToConstant: 68),
+            watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -10),
 
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             imageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),

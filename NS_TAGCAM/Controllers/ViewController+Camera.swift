@@ -22,18 +22,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         photoOutput = AVCapturePhotoOutput()
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
-            if #available(iOS 13.0, *) {
-                photoOutput.maxPhotoQualityPrioritization = .quality
-            }
-            if #available(iOS 16.0, *) {
-                if let maxDimensions = videoDevice.activeFormat.supportedMaxPhotoDimensions.max(by: {
-                    Int($0.width) * Int($0.height) < Int($1.width) * Int($1.height)
-                }) {
-                    photoOutput.maxPhotoDimensions = maxDimensions
-                }
-            } else {
-                photoOutput.isHighResolutionCaptureEnabled = true
-            }
+            configurePhotoOutputForBestQuality(using: videoDevice)
         }
         
         captureSession.commitConfiguration()
@@ -41,6 +30,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.insertSublayer(previewLayer, at: 0)
+        preparePhotoCapturePipeline()
     }
     
     func bestCamera(for position: AVCaptureDevice.Position) -> AVCaptureDevice? {
@@ -64,19 +54,67 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             if connection.isVideoRotationAngleSupported(rotationAngle) {
                 connection.videoRotationAngle = rotationAngle
             }
-            let photoSettings = AVCapturePhotoSettings()
-            photoSettings.flashMode = self.flashMode
-            
-            if #available(iOS 16.0, *) {
-                photoSettings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
-            } else {
-                photoSettings.isHighResolutionPhotoEnabled = true
-            }
-            if #available(iOS 13.0, *) {
-                photoSettings.photoQualityPrioritization = self.photoOutput.maxPhotoQualityPrioritization
-            }
+            let photoSettings = self.makePhotoSettingsForBestQuality()
             self.photoOutput.capturePhoto(with: photoSettings, delegate: self)
         }
+    }
+
+    func configurePhotoOutputForBestQuality(using device: AVCaptureDevice) {
+        if #available(iOS 13.0, *) {
+            photoOutput.maxPhotoQualityPrioritization = .quality
+        }
+
+        if #available(iOS 16.0, *) {
+            if let maxDimensions = device.activeFormat.supportedMaxPhotoDimensions.max(by: {
+                Int($0.width) * Int($0.height) < Int($1.width) * Int($1.height)
+            }) {
+                photoOutput.maxPhotoDimensions = maxDimensions
+            }
+        } else {
+            photoOutput.isHighResolutionCaptureEnabled = true
+        }
+
+        if photoOutput.isContentAwareDistortionCorrectionSupported {
+            photoOutput.isContentAwareDistortionCorrectionEnabled = true
+        }
+    }
+
+    func makePhotoSettingsForBestQuality() -> AVCapturePhotoSettings {
+        let settings: AVCapturePhotoSettings
+        if photoOutput.availablePhotoCodecTypes.contains(.hevc) {
+            settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+        } else {
+            settings = AVCapturePhotoSettings()
+        }
+
+        settings.flashMode = flashMode
+
+        if #available(iOS 16.0, *) {
+            settings.maxPhotoDimensions = photoOutput.maxPhotoDimensions
+        } else {
+            settings.isHighResolutionPhotoEnabled = true
+        }
+
+        if #available(iOS 13.0, *) {
+            settings.photoQualityPrioritization = .quality
+        }
+
+        settings.isAutoRedEyeReductionEnabled = photoOutput.isAutoRedEyeReductionSupported
+
+        if photoOutput.isContentAwareDistortionCorrectionSupported {
+            settings.isAutoContentAwareDistortionCorrectionEnabled = true
+        }
+
+        if photoOutput.isVirtualDeviceFusionSupported {
+            settings.isAutoVirtualDeviceFusionEnabled = true
+        }
+
+        return settings
+    }
+
+    func preparePhotoCapturePipeline() {
+        let preparedSettings = makePhotoSettingsForBestQuality()
+        photoOutput.setPreparedPhotoSettingsArray([preparedSettings], completionHandler: nil)
     }
     
     nonisolated func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
