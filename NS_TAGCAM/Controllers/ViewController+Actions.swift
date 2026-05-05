@@ -78,13 +78,14 @@ extension ViewController {
             device.unlockForConfiguration()
             
             focusSquare.center = touchPoint
+            focusSquare.layer.borderColor = UIColor.systemYellow.withAlphaComponent(0.95).cgColor
             focusSquare.alpha = 1
-            focusSquare.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+            focusSquare.transform = CGAffineTransform(scaleX: 1.18, y: 1.18)
             
-            UIView.animate(withDuration: 0.3, animations: {
+            UIView.animate(withDuration: 0.18, delay: 0, options: [.curveEaseOut], animations: {
                 self.focusSquare.transform = .identity
             }) { _ in
-                UIView.animate(withDuration: 0.3, delay: 1.0, options: .curveEaseInOut, animations: {
+                UIView.animate(withDuration: 0.22, delay: 0.55, options: [.curveEaseInOut], animations: {
                     self.focusSquare.alpha = 0
                 })
             }
@@ -97,6 +98,8 @@ extension ViewController {
     }
 
     func isPointAvailableForFocus(_ point: CGPoint) -> Bool {
+        guard focusInteractionRect().contains(point) else { return false }
+
         let blockedViews: [UIView] = [
             topBlurView,
             advancedControlsStack,
@@ -110,6 +113,31 @@ extension ViewController {
         return !blockedViews.contains { blockedView in
             !blockedView.isHidden && blockedView.alpha > 0.01 && blockedView.frame.contains(point)
         }
+    }
+
+    func focusInteractionRect() -> CGRect {
+        var rect = view.bounds.insetBy(dx: 24, dy: 24)
+
+        let topLimit = max(
+            topBlurView.frame.maxY,
+            advancedControlsStack.isHidden ? 0 : advancedControlsStack.frame.maxY
+        )
+        if topLimit > 0 {
+            rect.origin.y = max(rect.origin.y, topLimit + 12)
+        }
+
+        if !watermarkPreviewView.isHidden, watermarkPreviewView.alpha > 0.01 {
+            rect.size.height = min(rect.maxY, watermarkPreviewView.frame.minY - 12) - rect.origin.y
+        } else if zoomStackView.alpha > 0.01 {
+            rect.size.height = min(rect.maxY, zoomStackView.frame.minY - 12) - rect.origin.y
+        }
+
+        if effectiveOrientation().isLandscape {
+            rect.origin.x = max(rect.origin.x, topBlurView.frame.maxX + 12)
+            rect.size.width = min(rect.maxX, zoomStackView.frame.minX - 12) - rect.origin.x
+        }
+
+        return rect.standardized
     }
     
     @objc func buttonTouchDown(_ sender: UIButton) {
