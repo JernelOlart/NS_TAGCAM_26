@@ -14,6 +14,7 @@ extension ViewController: UIGestureRecognizerDelegate {
         view.addSubview(shutterView)
         view.addSubview(advancedControlsStack)
         view.addSubview(volumeCaptureView)
+        view.addSubview(startupOverlayView)
 
         watermarkPreviewView.contentView.addSubview(watermarkPreviewTitleLabel)
         watermarkPreviewView.contentView.addSubview(watermarkPreviewDivider)
@@ -21,6 +22,10 @@ extension ViewController: UIGestureRecognizerDelegate {
         watermarkPreviewView.contentView.addSubview(watermarkMapPreview)
         horizonGuideView.addSubview(horizonLineView)
         horizonGuideView.addSubview(horizonCenterDot)
+        startupOverlayView.addSubview(startupCardView)
+        startupCardView.contentView.addSubview(startupLogoView)
+        startupCardView.contentView.addSubview(startupTitleLabel)
+        startupCardView.contentView.addSubview(startupSubtitleLabel)
         
         let isoIcon = UIImageView(image: UIImage(systemName: "camera.aperture"))
         isoIcon.tintColor = .white
@@ -84,7 +89,27 @@ extension ViewController: UIGestureRecognizerDelegate {
             volumeCaptureView.widthAnchor.constraint(equalToConstant: 1),
             volumeCaptureView.heightAnchor.constraint(equalToConstant: 1),
             volumeCaptureView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            volumeCaptureView.topAnchor.constraint(equalTo: view.topAnchor)
+            volumeCaptureView.topAnchor.constraint(equalTo: view.topAnchor),
+
+            startupOverlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            startupOverlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            startupOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            startupOverlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+
+            startupCardView.centerXAnchor.constraint(equalTo: startupOverlayView.centerXAnchor),
+            startupCardView.centerYAnchor.constraint(equalTo: startupOverlayView.centerYAnchor),
+            startupCardView.leadingAnchor.constraint(greaterThanOrEqualTo: startupOverlayView.leadingAnchor, constant: 32),
+            startupCardView.trailingAnchor.constraint(lessThanOrEqualTo: startupOverlayView.trailingAnchor, constant: -32),
+
+            startupLogoView.topAnchor.constraint(equalTo: startupCardView.contentView.topAnchor, constant: 28),
+            startupLogoView.centerXAnchor.constraint(equalTo: startupCardView.contentView.centerXAnchor),
+            startupLogoView.widthAnchor.constraint(equalToConstant: 110),
+            startupLogoView.heightAnchor.constraint(equalToConstant: 110),
+            startupTitleLabel.topAnchor.constraint(equalTo: startupLogoView.bottomAnchor, constant: 18),
+            startupTitleLabel.centerXAnchor.constraint(equalTo: startupCardView.contentView.centerXAnchor),
+            startupSubtitleLabel.topAnchor.constraint(equalTo: startupTitleLabel.bottomAnchor, constant: 8),
+            startupSubtitleLabel.centerXAnchor.constraint(equalTo: startupCardView.contentView.centerXAnchor),
+            startupSubtitleLabel.bottomAnchor.constraint(equalTo: startupCardView.contentView.bottomAnchor, constant: -28)
         ]
 
         portraitLayoutConstraints = [
@@ -195,6 +220,7 @@ extension ViewController: UIGestureRecognizerDelegate {
         zoomStackView.layer.zPosition = 5
         imageView.layer.zPosition = 5
         galleryButton.layer.zPosition = 5
+        startupOverlayView.layer.zPosition = 20
         
         captureButton.addTarget(self, action: #selector(capturePhoto), for: .touchUpInside)
         captureButton.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
@@ -306,6 +332,47 @@ extension ViewController: UIGestureRecognizerDelegate {
 
         return !protectedViews.contains { candidate in
             touch.view?.isDescendant(of: candidate) == true
+        }
+    }
+
+    func presentStartupOverlayIfNeeded() {
+        guard !hasPresentedStartupOverlay else { return }
+        hasPresentedStartupOverlay = true
+
+        startupOverlayView.isHidden = false
+        startupOverlayView.alpha = 1
+        startupCardView.transform = CGAffineTransform(scaleX: 0.92, y: 0.92)
+        startupCardView.alpha = 0.94
+        startupLogoView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+
+        UIView.animate(
+            withDuration: 0.45,
+            delay: 0,
+            usingSpringWithDamping: 0.82,
+            initialSpringVelocity: 0.4,
+            options: [.curveEaseOut]
+        ) {
+            self.startupCardView.transform = .identity
+            self.startupLogoView.transform = .identity
+        }
+
+        UIView.animateKeyframes(withDuration: 0.9, delay: 0.08, options: [.calculationModeCubic]) {
+            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.45) {
+                self.startupCardView.transform = CGAffineTransform(scaleX: 1.03, y: 1.03)
+                self.startupLogoView.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
+            }
+            UIView.addKeyframe(withRelativeStartTime: 0.45, relativeDuration: 0.3) {
+                self.startupCardView.transform = .identity
+                self.startupLogoView.transform = .identity
+            }
+        }
+
+        UIView.animate(withDuration: 0.28, delay: 1.0, options: [.curveEaseInOut]) {
+            self.startupOverlayView.alpha = 0
+            self.startupCardView.alpha = 0
+            self.startupCardView.transform = CGAffineTransform(scaleX: 1.04, y: 1.04)
+        } completion: { _ in
+            self.startupOverlayView.isHidden = true
         }
     }
 }

@@ -316,6 +316,55 @@ class ViewController: UIViewController {
     let addressSwitch = UISwitch()
     let logoSwitch = UISwitch()
     let miniMapSwitch = UISwitch()
+    var hasPresentedStartupOverlay = false
+
+    let startupOverlayView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor(red: 0.04, green: 0.07, blue: 0.11, alpha: 1)
+        view.alpha = 0
+        return view
+    }()
+    let startupCardView: UIVisualEffectView = {
+        let blur = UIBlurEffect(style: .systemThinMaterialDark)
+        let view = UIVisualEffectView(effect: blur)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 28
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.white.withAlphaComponent(0.12).cgColor
+        view.clipsToBounds = true
+        return view
+    }()
+    let startupLogoView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "nsra"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    let startupTitleLabel: UILabel = {
+        let label = UILabel()
+        let baseFont = UIFont.systemFont(ofSize: 32, weight: .heavy)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "NS TagCam"
+        label.textColor = .white
+        label.font = UIFont(
+            descriptor: baseFont.fontDescriptor.withDesign(.rounded) ?? baseFont.fontDescriptor,
+            size: 32
+        )
+        return label
+    }()
+    let startupSubtitleLabel: UILabel = {
+        let label = UILabel()
+        let baseFont = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Capture with tagged evidence"
+        label.textColor = UIColor.white.withAlphaComponent(0.72)
+        label.font = UIFont(
+            descriptor: baseFont.fontDescriptor.withDesign(.rounded) ?? baseFont.fontDescriptor,
+            size: 14
+        )
+        return label
+    }()
 
     var sharedLayoutConstraints: [NSLayoutConstraint] = []
     var portraitLayoutConstraints: [NSLayoutConstraint] = []
@@ -344,6 +393,11 @@ class ViewController: UIViewController {
                 self.captureSession.startRunning()
             }
         }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        presentStartupOverlayIfNeeded()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
