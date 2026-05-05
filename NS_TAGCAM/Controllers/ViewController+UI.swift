@@ -1,15 +1,24 @@
 import UIKit
 
-extension ViewController {
+extension ViewController: UIGestureRecognizerDelegate {
     func setupUI() {
         view.addSubview(gridView)
+        view.addSubview(focusSquare)
         view.addSubview(topBlurView)
+        view.addSubview(watermarkPreviewView)
+        view.addSubview(horizonGuideView)
         view.addSubview(captureButton)
         view.addSubview(imageView)
+        view.addSubview(galleryButton)
         view.addSubview(zoomStackView)
         view.addSubview(shutterView)
-        view.addSubview(focusSquare)
         view.addSubview(advancedControlsStack)
+        view.addSubview(volumeCaptureView)
+
+        watermarkPreviewView.contentView.addSubview(watermarkPreviewLabel)
+        watermarkPreviewView.contentView.addSubview(watermarkMapPreview)
+        horizonGuideView.addSubview(horizonLineView)
+        horizonGuideView.addSubview(horizonCenterDot)
         
         let isoIcon = UIImageView(image: UIImage(systemName: "camera.aperture"))
         isoIcon.tintColor = .white
@@ -23,52 +32,155 @@ extension ViewController {
         
         advancedControlsStack.addArrangedSubview(isoStack)
         advancedControlsStack.addArrangedSubview(expStack)
+
+        [logoImageView, flashButton, aspectRatioButton, gridButton, orientationLockButton, switchCameraButton, controlsButton, infoButton]
+            .forEach { controlStackView.addArrangedSubview($0) }
+        topBlurView.contentView.addSubview(controlStackView)
+
+        configureWatermarkSwitches()
+        [
+            makeSwitchRow(title: "Coordenadas", control: coordinatesSwitch),
+            makeSwitchRow(title: "Altitud", control: altitudeSwitch),
+            makeSwitchRow(title: "Precisión", control: accuracySwitch),
+            makeSwitchRow(title: "Fecha", control: dateSwitch),
+            makeSwitchRow(title: "Dirección", control: addressSwitch),
+            makeSwitchRow(title: "Logo", control: logoSwitch),
+            makeSwitchRow(title: "Mini mapa", control: miniMapSwitch)
+        ].forEach { advancedControlsStack.addArrangedSubview($0) }
         
-        let controlStack = UIStackView(arrangedSubviews: [logoImageView, flashButton, aspectRatioButton, gridButton, switchCameraButton, controlsButton, infoButton])
-        controlStack.axis = .horizontal
-        controlStack.distribution = .equalSpacing
-        controlStack.alignment = .center
-        controlStack.spacing = 24
-        controlStack.translatesAutoresizingMaskIntoConstraints = false
-        topBlurView.contentView.addSubview(controlStack)
-        
-        NSLayoutConstraint.activate([
+        sharedLayoutConstraints = [
             logoImageView.widthAnchor.constraint(equalToConstant: 30),
             logoImageView.heightAnchor.constraint(equalToConstant: 30),
-            
-            topBlurView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            topBlurView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            topBlurView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, constant: -40),
-            topBlurView.heightAnchor.constraint(equalToConstant: 60),
-            
-            controlStack.leadingAnchor.constraint(equalTo: topBlurView.contentView.leadingAnchor, constant: 20),
-            controlStack.trailingAnchor.constraint(equalTo: topBlurView.contentView.trailingAnchor, constant: -20),
-            controlStack.centerYAnchor.constraint(equalTo: topBlurView.contentView.centerYAnchor),
-            
-            advancedControlsStack.topAnchor.constraint(equalTo: topBlurView.bottomAnchor, constant: 15),
-            advancedControlsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            advancedControlsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            advancedControlsStack.heightAnchor.constraint(equalToConstant: 100),
-            
+
             gridView.topAnchor.constraint(equalTo: view.topAnchor),
             gridView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             gridView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             gridView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+
+            horizonGuideView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            horizonGuideView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            horizonGuideView.widthAnchor.constraint(equalToConstant: 160),
+            horizonGuideView.heightAnchor.constraint(equalToConstant: 48),
+            horizonLineView.centerXAnchor.constraint(equalTo: horizonGuideView.centerXAnchor),
+            horizonLineView.centerYAnchor.constraint(equalTo: horizonGuideView.centerYAnchor),
+            horizonLineView.widthAnchor.constraint(equalToConstant: 120),
+            horizonLineView.heightAnchor.constraint(equalToConstant: 3),
+            horizonCenterDot.centerXAnchor.constraint(equalTo: horizonGuideView.centerXAnchor),
+            horizonCenterDot.centerYAnchor.constraint(equalTo: horizonGuideView.centerYAnchor),
+            horizonCenterDot.widthAnchor.constraint(equalToConstant: 8),
+            horizonCenterDot.heightAnchor.constraint(equalToConstant: 8),
             
-            captureButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            captureButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
             captureButton.widthAnchor.constraint(equalToConstant: 90),
             captureButton.heightAnchor.constraint(equalToConstant: 90),
             
+            galleryButton.widthAnchor.constraint(equalToConstant: 44),
+            galleryButton.heightAnchor.constraint(equalToConstant: 44),
+
+            imageView.widthAnchor.constraint(equalToConstant: 60),
+            imageView.heightAnchor.constraint(equalToConstant: 60),
+
+            volumeCaptureView.widthAnchor.constraint(equalToConstant: 1),
+            volumeCaptureView.heightAnchor.constraint(equalToConstant: 1),
+            volumeCaptureView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            volumeCaptureView.topAnchor.constraint(equalTo: view.topAnchor)
+        ]
+
+        portraitLayoutConstraints = [
+            topBlurView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            topBlurView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            topBlurView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, constant: -40),
+            topBlurView.heightAnchor.constraint(equalToConstant: 60),
+
+            controlStackView.leadingAnchor.constraint(equalTo: topBlurView.contentView.leadingAnchor, constant: 20),
+            controlStackView.trailingAnchor.constraint(equalTo: topBlurView.contentView.trailingAnchor, constant: -20),
+            controlStackView.centerYAnchor.constraint(equalTo: topBlurView.contentView.centerYAnchor),
+
+            advancedControlsStack.topAnchor.constraint(equalTo: topBlurView.bottomAnchor, constant: 15),
+            advancedControlsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            advancedControlsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            advancedControlsStack.heightAnchor.constraint(equalToConstant: 360),
+
+            captureButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
+            captureButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
             zoomStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             zoomStackView.bottomAnchor.constraint(equalTo: captureButton.topAnchor, constant: -30),
             zoomStackView.heightAnchor.constraint(equalToConstant: 44),
-            
-            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+
+            watermarkPreviewView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            watermarkPreviewView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            watermarkPreviewView.bottomAnchor.constraint(equalTo: zoomStackView.topAnchor, constant: -16),
+            watermarkPreviewView.heightAnchor.constraint(greaterThanOrEqualToConstant: 96),
+            watermarkPreviewLabel.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
+            watermarkPreviewLabel.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 12),
+            watermarkPreviewLabel.bottomAnchor.constraint(equalTo: watermarkPreviewView.contentView.bottomAnchor, constant: -12),
+            watermarkMapPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -12),
+            watermarkMapPreview.centerYAnchor.constraint(equalTo: watermarkPreviewView.contentView.centerYAnchor),
+            watermarkMapPreview.widthAnchor.constraint(equalToConstant: 72),
+            watermarkMapPreview.heightAnchor.constraint(equalToConstant: 72),
+            watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -12),
+
+            imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             imageView.centerYAnchor.constraint(equalTo: captureButton.centerYAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: 60),
-            imageView.heightAnchor.constraint(equalToConstant: 60)
-        ])
+            galleryButton.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 14),
+            galleryButton.centerYAnchor.constraint(equalTo: imageView.centerYAnchor)
+        ]
+
+        landscapeLayoutConstraints = [
+            topBlurView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 12),
+            topBlurView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            topBlurView.widthAnchor.constraint(equalToConstant: 64),
+            topBlurView.heightAnchor.constraint(lessThanOrEqualTo: view.heightAnchor, constant: -40),
+
+            controlStackView.topAnchor.constraint(equalTo: topBlurView.contentView.topAnchor, constant: 18),
+            controlStackView.bottomAnchor.constraint(equalTo: topBlurView.contentView.bottomAnchor, constant: -18),
+            controlStackView.centerXAnchor.constraint(equalTo: topBlurView.contentView.centerXAnchor),
+
+            advancedControlsStack.leadingAnchor.constraint(equalTo: topBlurView.trailingAnchor, constant: 16),
+            advancedControlsStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            advancedControlsStack.widthAnchor.constraint(equalToConstant: 220),
+            advancedControlsStack.heightAnchor.constraint(equalToConstant: 360),
+            advancedControlsStack.trailingAnchor.constraint(lessThanOrEqualTo: zoomStackView.leadingAnchor, constant: -20),
+
+            captureButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -28),
+            captureButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
+            zoomStackView.trailingAnchor.constraint(equalTo: captureButton.leadingAnchor, constant: -24),
+            zoomStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            zoomStackView.heightAnchor.constraint(equalToConstant: 44),
+
+            watermarkPreviewView.leadingAnchor.constraint(equalTo: topBlurView.trailingAnchor, constant: 16),
+            watermarkPreviewView.trailingAnchor.constraint(equalTo: captureButton.leadingAnchor, constant: -20),
+            watermarkPreviewView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            watermarkPreviewView.heightAnchor.constraint(greaterThanOrEqualToConstant: 96),
+            watermarkPreviewLabel.leadingAnchor.constraint(equalTo: watermarkPreviewView.contentView.leadingAnchor, constant: 14),
+            watermarkPreviewLabel.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 12),
+            watermarkPreviewLabel.bottomAnchor.constraint(equalTo: watermarkPreviewView.contentView.bottomAnchor, constant: -12),
+            watermarkMapPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -12),
+            watermarkMapPreview.centerYAnchor.constraint(equalTo: watermarkPreviewView.contentView.centerYAnchor),
+            watermarkMapPreview.widthAnchor.constraint(equalToConstant: 72),
+            watermarkMapPreview.heightAnchor.constraint(equalToConstant: 72),
+            watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -12),
+
+            imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            imageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            galleryButton.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 14),
+            galleryButton.centerYAnchor.constraint(equalTo: imageView.centerYAnchor)
+        ]
+
+        NSLayoutConstraint.activate(sharedLayoutConstraints)
+        updateAdaptiveLayout()
+        focusSquare.layer.zPosition = 1
+        shutterView.layer.zPosition = 2
+        gridView.layer.zPosition = 3
+        horizonGuideView.layer.zPosition = 4
+        topBlurView.layer.zPosition = 5
+        advancedControlsStack.layer.zPosition = 5
+        watermarkPreviewView.layer.zPosition = 5
+        captureButton.layer.zPosition = 5
+        zoomStackView.layer.zPosition = 5
+        imageView.layer.zPosition = 5
+        galleryButton.layer.zPosition = 5
         
         captureButton.addTarget(self, action: #selector(capturePhoto), for: .touchUpInside)
         captureButton.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
@@ -77,11 +189,16 @@ extension ViewController {
         infoButton.addTarget(self, action: #selector(showInfoAlert), for: .touchUpInside)
         gridButton.addTarget(self, action: #selector(toggleGrid), for: .touchUpInside)
         flashButton.addTarget(self, action: #selector(toggleFlash), for: .touchUpInside)
+        orientationLockButton.addTarget(self, action: #selector(toggleOrientationLock), for: .touchUpInside)
         switchCameraButton.addTarget(self, action: #selector(switchCamera), for: .touchUpInside)
         controlsButton.addTarget(self, action: #selector(toggleControls), for: .touchUpInside)
+        galleryButton.addTarget(self, action: #selector(openPhotoLibrary), for: .touchUpInside)
         isoSlider.addTarget(self, action: #selector(isoChanged(_:)), for: .valueChanged)
         exposureSlider.addTarget(self, action: #selector(exposureChanged(_:)), for: .valueChanged)
         aspectRatioButton.addTarget(self, action: #selector(toggleAspectRatio), for: .touchUpInside)
+
+        let galleryTapGesture = UITapGestureRecognizer(target: self, action: #selector(openPhotoLibrary))
+        imageView.addGestureRecognizer(galleryTapGesture)
         
         let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0, 3.0]
         for (index, zoom) in zoomLevels.enumerated() {
@@ -102,12 +219,79 @@ extension ViewController {
             zoomStackView.addArrangedSubview(button)
         }
     }
+
+    func updateAdaptiveLayout(animated: Bool = false) {
+        guard !sharedLayoutConstraints.isEmpty else { return }
+
+        let isLandscape = physicalOrientation.isLandscape || view.bounds.width > view.bounds.height
+
+        NSLayoutConstraint.deactivate(portraitLayoutConstraints + landscapeLayoutConstraints)
+        NSLayoutConstraint.activate(isLandscape ? landscapeLayoutConstraints : portraitLayoutConstraints)
+
+        controlStackView.axis = isLandscape ? .vertical : .horizontal
+        controlStackView.spacing = isLandscape ? 18 : 14
+        topBlurView.layer.cornerRadius = isLandscape ? 28 : 20
+        imageView.layer.cornerRadius = isLandscape ? 16 : 12
+
+        let updates = {
+            self.view.layoutIfNeeded()
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.3, animations: updates)
+        } else {
+            updates()
+        }
+    }
     
     func setupGestures() {
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
+        pinchGesture.delegate = self
         view.addGestureRecognizer(pinchGesture)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapToFocus(_:)))
+        tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
         view.addGestureRecognizer(tapGesture)
+    }
+
+    private func configureWatermarkSwitches() {
+        [coordinatesSwitch, altitudeSwitch, accuracySwitch, dateSwitch, addressSwitch, logoSwitch, miniMapSwitch].forEach {
+            $0.onTintColor = .systemYellow
+            $0.isOn = true
+            $0.addTarget(self, action: #selector(watermarkSwitchChanged(_:)), for: .valueChanged)
+        }
+    }
+
+    private func makeSwitchRow(title: String, control: UISwitch) -> UIStackView {
+        let label = UILabel()
+        label.text = title
+        label.textColor = .white
+        label.font = .systemFont(ofSize: 13, weight: .semibold)
+
+        let spacer = UIView()
+        spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+
+        let row = UIStackView(arrangedSubviews: [label, spacer, control])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = 12
+        return row
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        let protectedViews: [UIView] = [
+            topBlurView,
+            advancedControlsStack,
+            watermarkPreviewView,
+            captureButton,
+            imageView,
+            galleryButton,
+            zoomStackView
+        ]
+
+        return !protectedViews.contains { candidate in
+            touch.view?.isDescendant(of: candidate) == true
+        }
     }
 }

@@ -14,6 +14,10 @@ extension ViewController {
     }
     
     func handleDeviceMotion(_ data: CMDeviceMotion) {
+        updateHorizonIndicator(with: data)
+
+        guard !isOrientationLocked else { return }
+
         let x = data.gravity.x
         let y = data.gravity.y
         
@@ -34,37 +38,35 @@ extension ViewController {
         
         if newOrientation != physicalOrientation {
             physicalOrientation = newOrientation
+            requestSceneOrientationUpdate(for: newOrientation)
             updateUIForPhysicalOrientation()
         }
     }
     
     func updateUIForPhysicalOrientation() {
-        UIView.animate(withDuration: 0.3) {
-            let transform = self.controlRotationTransform()
-            self.switchCameraButton.transform = transform
-            self.flashButton.transform = transform
-            self.gridButton.transform = transform
-            self.controlsButton.transform = transform
-            self.infoButton.transform = transform
-        }
-
+        updateAdaptiveLayout(animated: true)
         updatePreviewLayerOrientation()
     }
 
-    func controlRotationTransform(scale: CGFloat = 1.0) -> CGAffineTransform {
-        let angle: CGFloat
-        switch physicalOrientation {
-        case .landscapeLeft: angle = .pi / 2
-        case .landscapeRight: angle = -.pi / 2
-        case .portraitUpsideDown: angle = .pi
-        default: angle = 0
+    func effectiveOrientation() -> UIDeviceOrientation {
+        if isOrientationLocked, let lockedOrientation {
+            return lockedOrientation
         }
-
-        return CGAffineTransform(rotationAngle: angle).scaledBy(x: scale, y: scale)
+        return physicalOrientation
     }
 
     func currentVideoRotationAngle() -> CGFloat {
-        switch physicalOrientation {
+        if let interfaceOrientation = view.window?.windowScene?.effectiveGeometry.interfaceOrientation {
+            switch interfaceOrientation {
+            case .portrait: return 90
+            case .landscapeRight: return 0
+            case .landscapeLeft: return 180
+            case .portraitUpsideDown: return 270
+            default: break
+            }
+        }
+
+        switch effectiveOrientation() {
         case .portrait: return 90
         case .landscapeLeft: return 0
         case .landscapeRight: return 180
@@ -78,6 +80,66 @@ extension ViewController {
         let rotationAngle = currentVideoRotationAngle()
         if connection.isVideoRotationAngleSupported(rotationAngle) {
             connection.videoRotationAngle = rotationAngle
+        }
+    }
+
+    func updateHorizonIndicator(with data: CMDeviceMotion) {
+        let orientation = effectiveOrientation()
+        let gravity = data.gravity
+
+        let angle: CGFloat
+        switch orientation {
+        case .landscapeLeft:
+            angle = CGFloat(atan2(gravity.y, gravity.x))
+        case .landscapeRight:
+            angle = CGFloat(atan2(-gravity.y, -gravity.x))
+        case .portraitUpsideDown:
+            angle = CGFloat(atan2(-gravity.x, gravity.y))
+        default:
+            angle = CGFloat(atan2(gravity.x, -gravity.y))
+        }
+
+        lastKnownLevelAngle = angle
+        horizonLineView.transform = CGAffineTransform(rotationAngle: angle)
+
+        let isLevel = abs(angle) < 0.08
+        horizonLineView.backgroundColor = isLevel ? .systemGreen : UIColor.systemYellow.withAlphaComponent(0.9)
+        horizonCenterDot.backgroundColor = isLevel ? .systemGreen : UIColor.white.withAlphaComponent(0.8)
+    }
+
+    func requestSceneOrientationUpdate(for orientation: UIDeviceOrientation) {
+        guard let windowScene = view.window?.windowScene else { return }
+
+        let targetMask: UIInterfaceOrientationMask
+        switch orientation {
+        case .landscapeLeft:
+            targetMask = .landscapeRight
+        case .landscapeRight:
+            targetMask = .landscapeLeft
+        case .portraitUpsideDown:
+            targetMask = UIDevice.current.userInterfaceIdiom == .pad ? .portraitUpsideDown : .portrait
+        case .portrait:
+            targetMask = .portrait
+        default:
+            return
+        }
+
+        let currentOrientation = windowScene.effectiveGeometry.interfaceOrientation
+        let targetOrientationMatchesCurrent: Bool
+        switch (targetMask, currentOrientation) {
+        case (.portrait, .portrait), (.portraitUpsideDown, .portraitUpsideDown),
+             (.landscapeLeft, .landscapeLeft), (.landscapeRight, .landscapeRight):
+            targetOrientationMatchesCurrent = true
+        default:
+            targetOrientationMatchesCurrent = false
+        }
+
+        guard !targetOrientationMatchesCurrent else { return }
+
+        setNeedsUpdateOfSupportedInterfaceOrientations()
+        let preferences = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: targetMask)
+        windowScene.requestGeometryUpdate(preferences) { error in
+            print("Orientation update error: \(error)")
         }
     }
 }

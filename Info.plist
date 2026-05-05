@@ -26,6 +26,8 @@
 	<string>Esta aplicación utiliza su ubicación para agregarla a las fotos como marca de agua.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Esta aplicación necesita acceso para guardar fotos en su biblioteca.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Esta aplicación necesita acceso a su biblioteca para mostrar la última foto tomada y permitirle revisarla.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

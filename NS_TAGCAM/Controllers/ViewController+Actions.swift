@@ -1,5 +1,9 @@
 import UIKit
 import AVFoundation
+import MapKit
+import MediaPlayer
+import Photos
+import PhotosUI
 
 extension ViewController {
     
@@ -55,6 +59,7 @@ extension ViewController {
     @objc func handleTapToFocus(_ gesture: UITapGestureRecognizer) {
         let touchPoint = gesture.location(in: view)
         guard let device = videoDeviceInput?.device else { return }
+        guard isPointAvailableForFocus(touchPoint) else { return }
         
         let cameraPoint = previewLayer.captureDevicePointConverted(fromLayerPoint: touchPoint)
         
@@ -90,29 +95,33 @@ extension ViewController {
             
         } catch { print(error) }
     }
+
+    func isPointAvailableForFocus(_ point: CGPoint) -> Bool {
+        let blockedViews: [UIView] = [
+            topBlurView,
+            advancedControlsStack,
+            watermarkPreviewView,
+            captureButton,
+            imageView,
+            galleryButton,
+            zoomStackView
+        ]
+
+        return !blockedViews.contains { blockedView in
+            !blockedView.isHidden && blockedView.alpha > 0.01 && blockedView.frame.contains(point)
+        }
+    }
     
     @objc func buttonTouchDown(_ sender: UIButton) {
         UIView.animate(withDuration: 0.1) {
-            sender.transform = self.transformForButtonPress(sender, scale: 0.85)
+            sender.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
         }
     }
     
     @objc func buttonTouchUp(_ sender: UIButton) {
         UIView.animate(withDuration: 0.1) {
-            sender.transform = self.transformForButtonPress(sender, scale: 1.0)
+            sender.transform = .identity
         }
-    }
-
-    func transformForButtonPress(_ button: UIButton, scale: CGFloat) -> CGAffineTransform {
-        let isRotatingControl = button == switchCameraButton
-            || button == flashButton
-            || button == gridButton
-            || button == controlsButton
-            || button == infoButton
-
-        return isRotatingControl
-            ? controlRotationTransform(scale: scale)
-            : CGAffineTransform(scaleX: scale, y: scale)
     }
     
     @objc func toggleGrid() {
@@ -253,5 +262,298 @@ extension ViewController {
         
         alert.addAction(UIAlertAction(title: "Cerrar", style: .cancel))
         present(alert, animated: true)
+    }
+
+    @objc func openPhotoLibrary() {
+        feedbackGenerator()
+
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        configuration.filter = .images
+        configuration.selectionLimit = 1
+
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
+    @objc func toggleOrientationLock() {
+        feedbackGenerator()
+        isOrientationLocked.toggle()
+        lockedOrientation = isOrientationLocked ? physicalOrientation : nil
+        orientationLockButton.tintColor = isOrientationLocked ? .systemYellow : .white
+        orientationLockButton.setImage(
+            UIImage(systemName: isOrientationLocked ? "lock.rotation" : "lock.open.rotation"),
+            for: .normal
+        )
+        setNeedsUpdateOfSupportedInterfaceOrientations()
+        requestSceneOrientationUpdate(for: effectiveOrientation())
+        updatePreviewLayerOrientation()
+    }
+
+    @objc func watermarkSwitchChanged(_ sender: UISwitch) {
+        updateWatermarkPreview()
+        if sender == miniMapSwitch, miniMapSwitch.isOn, let location = currentLocation {
+            refreshMapSnapshot(for: location)
+        }
+    }
+
+    func loadLatestPhotoThumbnail() {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+
+        switch status {
+        case .authorized, .limited:
+            fetchLatestPhotoThumbnail()
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
+                guard let self else { return }
+                if status == .authorized || status == .limited {
+                    self.fetchLatestPhotoThumbnail()
+                }
+            }
+        case .denied, .restricted:
+            break
+        @unknown default:
+            break
+        }
+    }
+
+    private func fetchLatestPhotoThumbnail() {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        fetchOptions.fetchLimit = 1
+
+        let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        guard let asset = assets.firstObject else { return }
+
+        let scale = view.window?.windowScene?.screen.scale ?? traitCollection.displayScale
+        let targetSize = CGSize(width: 180 * scale, height: 180 * scale)
+        let requestOptions = PHImageRequestOptions()
+        requestOptions.deliveryMode = .highQualityFormat
+        requestOptions.resizeMode = .exact
+        requestOptions.isNetworkAccessAllowed = true
+
+        PHImageManager.default().requestImage(
+            for: asset,
+            targetSize: targetSize,
+            contentMode: .aspectFill,
+            options: requestOptions
+        ) { [weak self] image, _ in
+            guard let self, let image else { return }
+            DispatchQueue.main.async {
+                self.imageView.image = image
+                self.imageView.alpha = 1
+                self.imageView.transform = .identity
+            }
+        }
+    }
+
+    func currentWatermarkConfiguration() -> WatermarkConfiguration {
+        WatermarkConfiguration(
+            showsCoordinates: coordinatesSwitch.isOn,
+            showsAltitude: altitudeSwitch.isOn,
+            showsAccuracy: accuracySwitch.isOn,
+            showsDate: dateSwitch.isOn,
+            showsAddress: addressSwitch.isOn,
+            showsLogo: logoSwitch.isOn,
+            showsMiniMap: miniMapSwitch.isOn
+        )
+    }
+
+    func updateWatermarkPreview() {
+        let location = currentLocation ?? CLLocation()
+        let config = currentWatermarkConfiguration()
+        watermarkPreviewLabel.text = watermarkText(for: location, address: address, configuration: config)
+        watermarkMapPreview.image = currentMapSnapshot
+        watermarkMapPreview.isHidden = !config.showsMiniMap
+    }
+
+    nonisolated func watermarkText(for location: CLLocation, address: String, configuration: WatermarkConfiguration) -> String {
+        var lines: [String] = []
+
+        if configuration.showsCoordinates {
+            lines.append(String(format: "Lat: %.6f  Lon: %.6f", location.coordinate.latitude, location.coordinate.longitude))
+        }
+        if configuration.showsAltitude {
+            lines.append(String(format: "Altitud: %.1f m", location.altitude))
+        }
+        if configuration.showsAccuracy {
+            lines.append(String(format: "Precisión: %.1f m", location.horizontalAccuracy))
+        }
+        if configuration.showsDate {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            lines.append("Fecha: \(formatter.string(from: Date()))")
+        }
+        if configuration.showsAddress {
+            lines.append("Dirección: \(address)")
+        }
+
+        if lines.isEmpty {
+            lines.append("NS TagCam")
+        }
+
+        return lines.joined(separator: "\n")
+    }
+
+    func refreshMapSnapshot(for location: CLLocation) {
+        guard miniMapSwitch.isOn else {
+            currentMapSnapshot = nil
+            updateWatermarkPreview()
+            return
+        }
+
+        if let lastSnapshotLocation, lastSnapshotLocation.distance(from: location) < 20 {
+            updateWatermarkPreview()
+            return
+        }
+
+        let options = MKMapSnapshotter.Options()
+        options.region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 220, longitudinalMeters: 220)
+        options.size = CGSize(width: 180, height: 180)
+        options.scale = view.window?.windowScene?.screen.scale ?? traitCollection.displayScale
+        options.showsBuildings = true
+        options.pointOfInterestFilter = .excludingAll
+
+        let snapshotter = MKMapSnapshotter(options: options)
+        snapshotter.start { [weak self] snapshot, error in
+            guard let self, let snapshot, error == nil else { return }
+
+            let renderedImage = UIGraphicsImageRenderer(size: options.size).image { _ in
+                snapshot.image.draw(at: .zero)
+
+                let point = snapshot.point(for: location.coordinate)
+                let pinBounds = CGRect(x: point.x - 9, y: point.y - 18, width: 18, height: 18)
+                let pin = UIImage(systemName: "mappin.circle.fill")?.withTintColor(.systemRed, renderingMode: .alwaysOriginal)
+                pin?.draw(in: pinBounds)
+            }
+
+            DispatchQueue.main.async {
+                self.lastSnapshotLocation = location
+                self.currentMapSnapshot = renderedImage
+                self.updateWatermarkPreview()
+            }
+        }
+    }
+
+    func setupVolumeButtonCapture() {
+        volumeObservation?.invalidate()
+
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session error: \(error)")
+        }
+
+        lastSystemVolume = AVAudioSession.sharedInstance().outputVolume
+        volumeObservation = AVAudioSession.sharedInstance().observe(\.outputVolume, options: [.old, .new]) { [weak self] _, change in
+            guard let self,
+                  let newValue = change.newValue,
+                  let oldValue = change.oldValue,
+                  newValue != oldValue
+            else { return }
+
+            DispatchQueue.main.async {
+                if self.isResettingVolume {
+                    self.isResettingVolume = false
+                    return
+                }
+
+                self.capturePhoto()
+                self.resetSystemVolume(to: oldValue)
+            }
+        }
+    }
+
+    private func resetSystemVolume(to value: Float) {
+        guard let slider = volumeCaptureView.subviews.compactMap({ $0 as? UISlider }).first else { return }
+        isResettingVolume = true
+        slider.value = value
+        slider.sendActions(for: .valueChanged)
+        lastSystemVolume = value
+    }
+
+    func saveImageToCustomAlbum(_ image: UIImage) {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        guard status == .authorized || status == .limited else {
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] status in
+                guard let self, status == .authorized || status == .limited else { return }
+                self.saveImageToCustomAlbum(image)
+            }
+            return
+        }
+
+        guard let imageData = image.jpegData(compressionQuality: 0.95) else { return }
+        ensureCustomAlbum { [weak self] collection in
+            guard let self, let collection else { return }
+
+            var placeholder: PHObjectPlaceholder?
+            PHPhotoLibrary.shared().performChanges({
+                let assetRequest = PHAssetCreationRequest.forAsset()
+                let options = PHAssetResourceCreationOptions()
+                assetRequest.addResource(with: .photo, data: imageData, options: options)
+                placeholder = assetRequest.placeholderForCreatedAsset
+
+                if let albumChangeRequest = PHAssetCollectionChangeRequest(for: collection),
+                   let placeholder {
+                    albumChangeRequest.addAssets([placeholder] as NSArray)
+                }
+            }) { [weak self] success, error in
+                if let error {
+                    print("Album save error: \(error)")
+                }
+                guard success else { return }
+                self?.loadLatestPhotoThumbnail()
+            }
+        }
+    }
+
+    private func ensureCustomAlbum(completion: @escaping (PHAssetCollection?) -> Void) {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "title = %@", customAlbumName)
+
+        if let existingAlbum = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions).firstObject {
+            completion(existingAlbum)
+            return
+        }
+
+        var albumPlaceholder: PHObjectPlaceholder?
+        PHPhotoLibrary.shared().performChanges({
+            let createAlbumRequest = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: self.customAlbumName)
+            albumPlaceholder = createAlbumRequest.placeholderForCreatedAssetCollection
+        }) { success, error in
+            if let error {
+                print("Album creation error: \(error)")
+            }
+
+            guard success, let albumPlaceholder else {
+                completion(nil)
+                return
+            }
+
+            let collection = PHAssetCollection.fetchAssetCollections(
+                withLocalIdentifiers: [albumPlaceholder.localIdentifier],
+                options: nil
+            ).firstObject
+            completion(collection)
+        }
+    }
+}
+
+extension ViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+
+        guard let result = results.first else { return }
+        guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else { return }
+
+        result.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+            guard let self, error == nil, let image = object as? UIImage else { return }
+
+            Task { @MainActor in
+                self.imageView.image = image
+                self.imageView.alpha = 1
+                self.imageView.transform = .identity
+            }
+        }
     }
 }

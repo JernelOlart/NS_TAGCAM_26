@@ -87,50 +87,45 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             let location = self.currentLocation ?? CoreLocation.CLLocation()
             let aspectRatio = self.currentAspectRatio
             let addressText = self.address
+            let configuration = self.currentWatermarkConfiguration()
+            let mapSnapshot = configuration.showsMiniMap ? self.currentMapSnapshot : nil
             
             // Process watermark in background to avoid blocking main thread
             DispatchQueue.global(qos: .userInitiated).async {
                 let croppedImage = self.cropToAspectRatio(image: image, aspectRatio: aspectRatio)
-                let watermarkedImage = self.addWatermark(image: croppedImage, location: location, address: addressText)
+                let watermarkedImage = self.addWatermark(
+                    image: croppedImage,
+                    location: location,
+                    address: addressText,
+                    configuration: configuration,
+                    mapSnapshot: mapSnapshot
+                )
                 
                 DispatchQueue.main.async {
                     self.imageView.image = watermarkedImage
-                    self.imageView.isHidden = false
                     self.imageView.alpha = 0
                     self.imageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
                     
                     UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: .curveEaseOut, animations: {
                         self.imageView.alpha = 1
                         self.imageView.transform = .identity
-                    })
+                    }) 
                     
                     self.previewTimer?.invalidate()
-                    self.previewTimer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
-                        UIView.animate(withDuration: 0.5, animations: {
-                            self.imageView.alpha = 0
-                            self.imageView.transform = CGAffineTransform(translationX: -100, y: 0)
-                        }) { _ in
-                            self.imageView.isHidden = true
-                        }
-                    }
-                    UIImageWriteToSavedPhotosAlbum(watermarkedImage, nil, nil, nil)
+                    self.saveImageToCustomAlbum(watermarkedImage)
                 }
             }
         }
     }
     
-    nonisolated func addWatermark(image: UIImage, location: CoreLocation.CLLocation, address: String) -> UIImage {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
-        let watermarkText = """
-        Latitud: \(location.coordinate.latitude)
-        Longitud: \(location.coordinate.longitude)
-        Elevación: \(location.altitude) m
-        Precisión: \(location.horizontalAccuracy) m
-        Fecha: \(dateFormatter.string(from: Date()))
-        Dirección: \(address)
-        """
+    nonisolated func addWatermark(
+        image: UIImage,
+        location: CoreLocation.CLLocation,
+        address: String,
+        configuration: WatermarkConfiguration,
+        mapSnapshot: UIImage?
+    ) -> UIImage {
+        let watermarkText = watermarkText(for: location, address: address, configuration: configuration)
         
         // Calculate dynamic sizes based on the smaller dimension to ensure consistency
         let minDimension = min(image.size.width, image.size.height)
@@ -152,7 +147,7 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
             with: CGSize(width: maxWidth, height: image.size.height),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             context: nil
-        )
+        ) 
         
         let backgroundHeight = textBoundingRect.height + (textPadding * 2)
         let backgroundRect = CGRect(x: 0, y: image.size.height - backgroundHeight, width: image.size.width, height: backgroundHeight)
@@ -172,10 +167,28 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         watermarkText.draw(in: textDrawingRect, withAttributes: textAttributes)
         
         // Draw logo as a watermark in the corner
-        if let logo = UIImage(named: "nsra") {
+        if configuration.showsLogo, let logo = UIImage(named: "nsra") {
             let logoSize: CGFloat = minDimension * 0.12
             let logoRect = CGRect(x: image.size.width - logoSize - textPadding, y: textPadding, width: logoSize, height: logoSize)
             logo.draw(in: logoRect, blendMode: .normal, alpha: 0.8)
+        }
+
+        if configuration.showsMiniMap, let mapSnapshot {
+            let mapSize = CGSize(width: minDimension * 0.22, height: minDimension * 0.22)
+            let mapRect = CGRect(
+                x: image.size.width - mapSize.width - textPadding,
+                y: image.size.height - backgroundHeight - mapSize.height - textPadding,
+                width: mapSize.width,
+                height: mapSize.height
+            )
+
+            let roundedPath = UIBezierPath(roundedRect: mapRect, cornerRadius: minDimension * 0.02)
+            roundedPath.addClip()
+            mapSnapshot.draw(in: mapRect)
+
+            UIColor.white.withAlphaComponent(0.7).setStroke()
+            roundedPath.lineWidth = 2
+            roundedPath.stroke()
         }
         
         let result = UIGraphicsGetImageFromCurrentImageContext()

@@ -14,6 +14,8 @@ extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         currentLocation = locations.last
         if let location = currentLocation {
+            updateWatermarkPreview()
+            refreshMapSnapshot(for: location)
             Task {
                 do {
                     guard let request = MKReverseGeocodingRequest(location: location) else { return }
@@ -22,6 +24,7 @@ extension ViewController: CLLocationManagerDelegate {
                         .fullAddress(includingRegion: true, singleLine: true)
                         ?? mapItems.first?.address?.fullAddress
                         ?? self.address
+                    self.updateWatermarkPreview()
                 } catch {
                     print("Geocoding error: \(error)")
                 }

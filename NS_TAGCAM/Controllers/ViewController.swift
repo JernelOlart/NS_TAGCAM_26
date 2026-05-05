@@ -2,8 +2,21 @@ import UIKit
 import AVFoundation
 import CoreLocation
 import CoreMotion
+import MapKit
+import MediaPlayer
+import Photos
+import PhotosUI
 
 class ViewController: UIViewController {
+    struct WatermarkConfiguration {
+        let showsCoordinates: Bool
+        let showsAltitude: Bool
+        let showsAccuracy: Bool
+        let showsDate: Bool
+        let showsAddress: Bool
+        let showsLogo: Bool
+        let showsMiniMap: Bool
+    }
     
     // MARK: - Properties
     var captureSession: AVCaptureSession!
@@ -26,6 +39,15 @@ class ViewController: UIViewController {
     var flashMode: AVCaptureDevice.FlashMode = .auto
     var currentZoomFactor: CGFloat = 1.0
     var isControlsVisible = false
+    var isOrientationLocked = false
+    var lockedOrientation: UIDeviceOrientation?
+    var lastKnownLevelAngle: CGFloat = 0
+    var currentMapSnapshot: UIImage?
+    var lastSnapshotLocation: CLLocation?
+    var volumeObservation: NSKeyValueObservation?
+    var isResettingVolume = false
+    var lastSystemVolume = AVAudioSession.sharedInstance().outputVolume
+    let customAlbumName = "NS TagCam"
     
     enum AspectRatio: String, CaseIterable {
         case ratio4_3 = "4:3"
@@ -55,12 +77,19 @@ class ViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    let orientationLockButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "lock.rotation"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
     let advancedControlsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 20
-        stack.distribution = .fillEqually
+        stack.spacing = 12
+        stack.distribution = .fill
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.isHidden = true
         stack.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -116,13 +145,24 @@ class ViewController: UIViewController {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.isHidden = true
         imageView.layer.cornerRadius = 12
         imageView.clipsToBounds = true
-        imageView.backgroundColor = .black
+        imageView.backgroundColor = UIColor.black.withAlphaComponent(0.45)
         imageView.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
         imageView.layer.borderWidth = 1.5
+        imageView.isUserInteractionEnabled = true
         return imageView
+    }()
+    let galleryButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "photo.on.rectangle.angled"), for: .normal)
+        button.tintColor = .white
+        button.backgroundColor = UIColor.black.withAlphaComponent(0.45)
+        button.layer.cornerRadius = 22
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.white.withAlphaComponent(0.28).cgColor
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     let infoButton: UIButton = {
@@ -163,6 +203,15 @@ class ViewController: UIViewController {
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
+    let controlStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .equalSpacing
+        stack.alignment = .center
+        stack.spacing = 24
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
     let gridView: GridView = {
         let view = GridView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -191,6 +240,70 @@ class ViewController: UIViewController {
         view.isUserInteractionEnabled = false
         return view
     }()
+    let watermarkPreviewView: UIVisualEffectView = {
+        let blur = UIBlurEffect(style: .systemUltraThinMaterialDark)
+        let view = UIVisualEffectView(effect: blur)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 18
+        view.clipsToBounds = true
+        return view
+    }()
+    let watermarkPreviewLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        label.textColor = .white
+        label.font = .monospacedSystemFont(ofSize: 11, weight: .medium)
+        return label
+    }()
+    let watermarkMapPreview: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 12
+        imageView.clipsToBounds = true
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = UIColor.white.withAlphaComponent(0.35).cgColor
+        imageView.backgroundColor = UIColor.white.withAlphaComponent(0.08)
+        return imageView
+    }()
+    let horizonGuideView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isUserInteractionEnabled = false
+        return view
+    }()
+    let horizonLineView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.systemYellow.withAlphaComponent(0.9)
+        view.layer.cornerRadius = 1.5
+        return view
+    }()
+    let horizonCenterDot: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor.white.withAlphaComponent(0.8)
+        view.layer.cornerRadius = 4
+        return view
+    }()
+    let volumeCaptureView: MPVolumeView = {
+        let view = MPVolumeView(frame: .zero)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.alpha = 0.01
+        return view
+    }()
+    let coordinatesSwitch = UISwitch()
+    let altitudeSwitch = UISwitch()
+    let accuracySwitch = UISwitch()
+    let dateSwitch = UISwitch()
+    let addressSwitch = UISwitch()
+    let logoSwitch = UISwitch()
+    let miniMapSwitch = UISwitch()
+
+    var sharedLayoutConstraints: [NSLayoutConstraint] = []
+    var portraitLayoutConstraints: [NSLayoutConstraint] = []
+    var landscapeLayoutConstraints: [NSLayoutConstraint] = []
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -200,11 +313,16 @@ class ViewController: UIViewController {
         setupCamera()
         setupUI()
         setupGestures()
+        loadLatestPhotoThumbnail()
+        setupVolumeButtonCapture()
         setupMotionManager()
+        updateWatermarkPreview()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupVolumeButtonCapture()
+        requestSceneOrientationUpdate(for: effectiveOrientation())
         sessionQueue.async {
             if !self.captureSession.isRunning {
                 self.captureSession.startRunning()
@@ -222,6 +340,7 @@ class ViewController: UIViewController {
         if motionManager.isDeviceMotionActive {
             motionManager.stopDeviceMotionUpdates()
         }
+        volumeObservation?.invalidate()
         super.viewWillDisappear(animated)
     }
     
@@ -229,21 +348,32 @@ class ViewController: UIViewController {
         super.viewWillLayoutSubviews()
         previewLayer?.frame = view.layer.bounds
         shutterView.frame = view.bounds
+        updateAdaptiveLayout()
         updatePreviewLayerOrientation()
     }
 
     override var shouldAutorotate: Bool {
-        true
+        !isOrientationLocked
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
+        if isOrientationLocked, let lockedOrientation {
+            switch lockedOrientation {
+            case .landscapeLeft: return .landscapeRight
+            case .landscapeRight: return .landscapeLeft
+            case .portraitUpsideDown: return .portraitUpsideDown
+            default: return .portrait
+            }
+        }
+
+        return UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         coordinator.animate(alongsideTransition: { _ in
             self.previewLayer?.frame = self.view.bounds
+            self.updateAdaptiveLayout()
             self.updatePreviewLayerOrientation()
         })
     }
