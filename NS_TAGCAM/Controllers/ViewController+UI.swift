@@ -20,6 +20,7 @@ extension ViewController: UIGestureRecognizerDelegate {
         watermarkPreviewView.contentView.addSubview(watermarkPreviewDivider)
         watermarkPreviewView.contentView.addSubview(watermarkPreviewLabel)
         watermarkPreviewView.contentView.addSubview(watermarkMapPreview)
+        watermarkPreviewView.contentView.addSubview(watermarkLogoPreview)
         horizonGuideView.addSubview(horizonLineView)
         horizonGuideView.addSubview(horizonCenterDot)
         startupOverlayView.addSubview(startupCardView)
@@ -40,7 +41,7 @@ extension ViewController: UIGestureRecognizerDelegate {
         advancedControlsStack.addArrangedSubview(isoStack)
         advancedControlsStack.addArrangedSubview(expStack)
 
-        [logoImageView, flashButton, aspectRatioButton, gridButton, orientationLockButton, switchCameraButton, controlsButton, infoButton]
+        [logoImageView, flashButton, aspectRatioButton, gridButton, orientationLockButton, presetButton, switchCameraButton, controlsButton, infoButton]
             .forEach { controlStackView.addArrangedSubview($0) }
         topBlurView.contentView.addSubview(controlStackView)
 
@@ -153,6 +154,12 @@ extension ViewController: UIGestureRecognizerDelegate {
             watermarkMapPreview.heightAnchor.constraint(equalToConstant: 68),
             watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -10),
 
+            watermarkLogoPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -14),
+            watermarkLogoPreview.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 10),
+            watermarkLogoPreview.widthAnchor.constraint(equalToConstant: 24),
+            watermarkLogoPreview.heightAnchor.constraint(equalToConstant: 24),
+
+
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             imageView.centerYAnchor.constraint(equalTo: captureButton.centerYAnchor),
             galleryButton.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 14),
@@ -201,6 +208,12 @@ extension ViewController: UIGestureRecognizerDelegate {
             watermarkMapPreview.heightAnchor.constraint(equalToConstant: 68),
             watermarkPreviewLabel.trailingAnchor.constraint(equalTo: watermarkMapPreview.leadingAnchor, constant: -10),
 
+            watermarkLogoPreview.trailingAnchor.constraint(equalTo: watermarkPreviewView.contentView.trailingAnchor, constant: -14),
+            watermarkLogoPreview.topAnchor.constraint(equalTo: watermarkPreviewView.contentView.topAnchor, constant: 10),
+            watermarkLogoPreview.widthAnchor.constraint(equalToConstant: 24),
+            watermarkLogoPreview.heightAnchor.constraint(equalToConstant: 24),
+
+
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             imageView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             galleryButton.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 14),
@@ -232,12 +245,13 @@ extension ViewController: UIGestureRecognizerDelegate {
         orientationLockButton.addTarget(self, action: #selector(toggleOrientationLock), for: .touchUpInside)
         switchCameraButton.addTarget(self, action: #selector(switchCamera), for: .touchUpInside)
         controlsButton.addTarget(self, action: #selector(toggleControls), for: .touchUpInside)
-        galleryButton.addTarget(self, action: #selector(openPhotoLibrary), for: .touchUpInside)
+        galleryButton.addTarget(self, action: #selector(openGallery), for: .touchUpInside)
         isoSlider.addTarget(self, action: #selector(isoChanged(_:)), for: .valueChanged)
         exposureSlider.addTarget(self, action: #selector(exposureChanged(_:)), for: .valueChanged)
         aspectRatioButton.addTarget(self, action: #selector(toggleAspectRatio), for: .touchUpInside)
+        presetButton.addTarget(self, action: #selector(showPresetMenu), for: .touchUpInside)
 
-        let galleryTapGesture = UITapGestureRecognizer(target: self, action: #selector(openPhotoLibrary))
+        let galleryTapGesture = UITapGestureRecognizer(target: self, action: #selector(openGallery))
         imageView.addGestureRecognizer(galleryTapGesture)
         
         let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0, 3.0]

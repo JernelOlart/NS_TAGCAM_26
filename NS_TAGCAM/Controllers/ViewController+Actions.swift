@@ -292,7 +292,7 @@ extension ViewController {
         present(alert, animated: true)
     }
 
-    @objc func openPhotoLibrary() {
+    @objc func openSystemPhotoLibrary() {
         feedbackGenerator()
 
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
@@ -302,6 +302,14 @@ extension ViewController {
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
         present(picker, animated: true)
+    }
+
+    @objc func openGallery() {
+        feedbackGenerator()
+        let galleryVC = GalleryViewController()
+        let nav = UINavigationController(rootViewController: galleryVC)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
 
     @objc func toggleOrientationLock() {
@@ -325,6 +333,36 @@ extension ViewController {
         }
     }
 
+    @objc func showPresetMenu() {
+        feedbackGenerator()
+        let alert = UIAlertController(title: "Formato de Marca de Agua", message: "Selecciona un estilo para la etiqueta", preferredStyle: .actionSheet)
+        
+        for preset in WatermarkPreset.allCases {
+            let action = UIAlertAction(title: preset.rawValue, style: .default) { _ in
+                self.changePreset(preset)
+            }
+            if preset == currentPreset {
+                action.setValue(true, forKey: "checked")
+            }
+            alert.addAction(action)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel))
+        
+        if let popoverController = alert.popoverPresentationController {
+            popoverController.sourceView = presetButton
+            popoverController.sourceRect = presetButton.bounds
+        }
+        
+        present(alert, animated: true)
+    }
+    
+    func changePreset(_ preset: WatermarkPreset) {
+        feedbackGenerator()
+        currentPreset = preset
+        updateWatermarkPreview()
+    }
+
     func loadLatestPhotoThumbnail() {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
 
@@ -346,20 +384,49 @@ extension ViewController {
     }
 
     private func fetchLatestPhotoThumbnail() {
+        ensureCustomAlbum { [weak self] collection in
+            guard let self else { return }
+            
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            fetchOptions.fetchLimit = 1
+            
+            let assets: PHFetchResult<PHAsset>
+            if let collection = collection {
+                assets = PHAsset.fetchAssets(in: collection, options: fetchOptions)
+            } else {
+                assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+            }
+            
+            guard let asset = assets.firstObject else {
+                // If NS TagCam album is empty, try the general library
+                if collection != nil {
+                    self.fetchFromGeneralLibrary()
+                }
+                return
+            }
+            
+            self.requestThumbnail(for: asset)
+        }
+    }
+    
+    private func fetchFromGeneralLibrary() {
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.fetchLimit = 1
-
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        guard let asset = assets.firstObject else { return }
-
-        let scale = view.window?.windowScene?.screen.scale ?? traitCollection.displayScale
-        let targetSize = CGSize(width: 180 * scale, height: 180 * scale)
+        if let asset = assets.firstObject {
+            self.requestThumbnail(for: asset)
+        }
+    }
+    
+    private func requestThumbnail(for asset: PHAsset) {
+        let scale = UIScreen.main.scale
+        let targetSize = CGSize(width: 80 * scale, height: 80 * scale)
         let requestOptions = PHImageRequestOptions()
         requestOptions.deliveryMode = .highQualityFormat
-        requestOptions.resizeMode = .exact
         requestOptions.isNetworkAccessAllowed = true
-
+        
         PHImageManager.default().requestImage(
             for: asset,
             targetSize: targetSize,
@@ -370,7 +437,6 @@ extension ViewController {
             DispatchQueue.main.async {
                 self.imageView.image = image
                 self.imageView.alpha = 1
-                self.imageView.transform = .identity
             }
         }
     }
@@ -394,11 +460,13 @@ extension ViewController {
         watermarkPreviewLabel.attributedText = watermarkPreviewAttributedText(
             for: location,
             address: address,
-            configuration: config
+            configuration: config,
+            preset: currentPreset
         )
         watermarkMapPreview.image = currentMapSnapshot
-        watermarkMapPreview.isHidden = !config.showsMiniMap
-        watermarkPreviewDivider.isHidden = false
+        watermarkMapPreview.isHidden = !config.showsMiniMap || currentPreset == .minimalist
+        watermarkLogoPreview.isHidden = !config.showsLogo || currentPreset == .minimalist || currentPreset == .compact
+        watermarkPreviewDivider.isHidden = currentPreset == .minimalist
     }
 
     nonisolated func watermarkText(for location: CLLocation, address: String, configuration: WatermarkConfiguration) -> String {
@@ -432,7 +500,8 @@ extension ViewController {
     nonisolated func watermarkPreviewAttributedText(
         for location: CLLocation,
         address: String,
-        configuration: WatermarkConfiguration
+        configuration: WatermarkConfiguration,
+        preset: WatermarkPreset
     ) -> NSAttributedString {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineSpacing = 2
@@ -466,27 +535,54 @@ extension ViewController {
             )
         }
 
-        if configuration.showsCoordinates {
+        switch preset {
+        case .compact:
             append("GPS", String(format: "%.5f, %.5f", location.coordinate.latitude, location.coordinate.longitude))
-        }
-        if configuration.showsAltitude {
-            append("ALT", String(format: "%.1f m", location.altitude))
-        }
-        if configuration.showsAccuracy {
-            append("ACC", String(format: "%.1f m", location.horizontalAccuracy))
-        }
-        if configuration.showsDate {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm"
             append("TIME", formatter.string(from: Date()))
-        }
-        if configuration.showsAddress {
-            let compactAddress = address
-                .replacingOccurrences(of: ", ", with: "\n")
-                .split(separator: "\n")
-                .prefix(2)
-                .joined(separator: " · ")
-            append("ADDR", compactAddress.isEmpty ? "Sin dirección" : compactAddress)
+            
+        case .technical:
+            if configuration.showsCoordinates {
+                append("GPS", String(format: "%.6f, %.6f", location.coordinate.latitude, location.coordinate.longitude))
+            }
+            if configuration.showsAltitude {
+                append("ALT", String(format: "%.1f m", location.altitude))
+            }
+            if configuration.showsAccuracy {
+                append("ACC", String(format: "%.1f m", location.horizontalAccuracy))
+            }
+            if configuration.showsDate {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                append("TIME", formatter.string(from: Date()))
+            }
+            if configuration.showsAddress {
+                let compactAddress = address
+                    .replacingOccurrences(of: ", ", with: "\n")
+                    .split(separator: "\n")
+                    .prefix(1)
+                    .joined(separator: " ")
+                append("ADDR", compactAddress.isEmpty ? "Sin dirección" : compactAddress)
+            }
+            
+        case .judicial:
+            append("REF", "NS_TAGCAM_\(Int(Date().timeIntervalSince1970))")
+            append("LAT", String(format: "%.6f", location.coordinate.latitude))
+            append("LON", String(format: "%.6f", location.coordinate.longitude))
+            append("ALT", String(format: "%.1f m", location.altitude))
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            append("FECHA", formatter.string(from: Date()))
+            append("LUGAR", address.isEmpty ? "No disponible" : address)
+            
+        case .minimalist:
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd/MM/yyyy HH:mm"
+            append("NS", formatter.string(from: Date()))
+            if configuration.showsCoordinates {
+                append("POS", String(format: "%.4f, %.4f", location.coordinate.latitude, location.coordinate.longitude))
+            }
         }
 
         if fullText.string.isEmpty {
@@ -591,6 +687,15 @@ extension ViewController {
             PHPhotoLibrary.shared().performChanges({
                 let assetRequest = PHAssetCreationRequest.forAsset()
                 let options = PHAssetResourceCreationOptions()
+                
+                // Automatic naming logic
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyyMMdd_HHmmss"
+                let dateString = formatter.string(from: Date())
+                let locationString = self.currentLocation != nil ? String(format: "_%.4f_%.4f", self.currentLocation!.coordinate.latitude, self.currentLocation!.coordinate.longitude) : ""
+                let fileName = "NSTagCam_\(dateString)\(locationString).jpg"
+                
+                options.originalFilename = fileName
                 assetRequest.addResource(with: .photo, data: imageData, options: options)
                 placeholder = assetRequest.placeholderForCreatedAsset
 

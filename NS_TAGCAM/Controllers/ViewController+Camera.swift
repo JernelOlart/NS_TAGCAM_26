@@ -136,7 +136,8 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
                     location: location,
                     address: addressText,
                     configuration: configuration,
-                    mapSnapshot: mapSnapshot
+                    mapSnapshot: mapSnapshot,
+                    preset: self.currentPreset
                 )
                 
                 DispatchQueue.main.async {
@@ -161,77 +162,153 @@ extension ViewController: AVCapturePhotoCaptureDelegate {
         location: CoreLocation.CLLocation,
         address: String,
         configuration: WatermarkConfiguration,
-        mapSnapshot: UIImage?
+        mapSnapshot: UIImage?,
+        preset: WatermarkPreset
     ) -> UIImage {
-        let watermarkText = watermarkText(for: location, address: address, configuration: configuration)
-        
-        // Calculate dynamic sizes based on the smaller dimension to ensure consistency
         let minDimension = min(image.size.width, image.size.height)
-        let fontSize: CGFloat = minDimension * 0.03
         let textPadding: CGFloat = minDimension * 0.04
-        
-        let textAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: fontSize, weight: .semibold),
-            .foregroundColor: UIColor.white
-        ]
         
         UIGraphicsBeginImageContextWithOptions(image.size, false, 1.0)
         image.draw(in: CGRect(origin: .zero, size: image.size))
         
-        // Calculate required text height dynamically
-        let maxWidth = image.size.width - (textPadding * 2)
-        let attributedString = NSAttributedString(string: watermarkText, attributes: textAttributes)
-        let textBoundingRect = attributedString.boundingRect(
-            with: CGSize(width: maxWidth, height: image.size.height),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            context: nil
-        ) 
-        
-        let backgroundHeight = textBoundingRect.height + (textPadding * 2)
-        let backgroundRect = CGRect(x: 0, y: image.size.height - backgroundHeight, width: image.size.width, height: backgroundHeight)
-        
-        // Draw semi-transparent background for better readability
         let context = UIGraphicsGetCurrentContext()
-        context?.setFillColor(UIColor.black.withAlphaComponent(0.5).cgColor)
-        context?.fill(backgroundRect)
         
-        // Draw the text inside the background
-        let textDrawingRect = CGRect(
-            x: textPadding,
-            y: image.size.height - backgroundHeight + textPadding,
-            width: maxWidth,
-            height: textBoundingRect.height
-        )
-        watermarkText.draw(in: textDrawingRect, withAttributes: textAttributes)
+        // 1. Prepare Text and Attributes based on Preset
+        let watermarkText = watermarkText(for: location, address: address, configuration: configuration) // We should probably have a preset-specific watermark text function too, but let's use the one we have for now or refine it.
         
-        // Draw logo as a watermark in the corner
-        if configuration.showsLogo, let logo = UIImage(named: "nsra") {
-            let logoSize: CGFloat = minDimension * 0.12
-            let logoRect = CGRect(x: image.size.width - logoSize - textPadding, y: textPadding, width: logoSize, height: logoSize)
-            logo.draw(in: logoRect, blendMode: .normal, alpha: 0.8)
-        }
-
-        if configuration.showsMiniMap, let mapSnapshot {
-            let mapSize = CGSize(width: minDimension * 0.22, height: minDimension * 0.22)
-            let mapRect = CGRect(
-                x: image.size.width - mapSize.width - textPadding,
-                y: image.size.height - backgroundHeight - mapSize.height - textPadding,
-                width: mapSize.width,
-                height: mapSize.height
-            )
-
-            let roundedPath = UIBezierPath(roundedRect: mapRect, cornerRadius: minDimension * 0.02)
-            roundedPath.addClip()
-            mapSnapshot.draw(in: mapRect)
-
-            UIColor.white.withAlphaComponent(0.7).setStroke()
-            roundedPath.lineWidth = 2
-            roundedPath.stroke()
+        // Actually, let's use a more localized rendering logic for each preset
+        switch preset {
+        case .compact:
+            renderCompactWatermark(image: image, location: location, minDimension: minDimension, padding: textPadding)
+        case .technical:
+            renderTechnicalWatermark(image: image, location: location, address: address, config: configuration, map: mapSnapshot, minDimension: minDimension, padding: textPadding)
+        case .judicial:
+            renderJudicialWatermark(image: image, location: location, address: address, minDimension: minDimension, padding: textPadding)
+        case .minimalist:
+            renderMinimalistWatermark(image: image, location: location, minDimension: minDimension, padding: textPadding)
         }
         
         let result = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return result ?? image
+    }
+
+    private nonisolated func renderCompactWatermark(image: UIImage, location: CoreLocation.CLLocation, minDimension: CGFloat, padding: CGFloat) {
+        let fontSize = minDimension * 0.035
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .bold),
+            .foregroundColor: UIColor.white
+        ]
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let text = "NS TagCam | \(formatter.string(from: Date())) | \(String(format: "%.4f, %.4f", location.coordinate.latitude, location.coordinate.longitude))"
+        
+        let size = text.size(withAttributes: attributes)
+        let rect = CGRect(x: padding, y: image.size.height - size.height - padding, width: size.width, height: size.height)
+        
+        UIColor.black.withAlphaComponent(0.4).setFill()
+        UIRectFill(rect.insetBy(dx: -4, dy: -2))
+        text.draw(in: rect, withAttributes: attributes)
+    }
+
+    private nonisolated func renderTechnicalWatermark(image: UIImage, location: CoreLocation.CLLocation, address: String, config: WatermarkConfiguration, map: UIImage?, minDimension: CGFloat, padding: CGFloat) {
+        let fontSize = minDimension * 0.028
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.monospacedSystemFont(ofSize: fontSize, weight: .semibold),
+            .foregroundColor: UIColor.white
+        ]
+        
+        var lines: [String] = []
+        lines.append("NS TAGCAM TECHNICAL REPORT")
+        lines.append("LAT: \(String(format: "%.6f", location.coordinate.latitude))")
+        lines.append("LON: \(String(format: "%.6f", location.coordinate.longitude))")
+        lines.append("ALT: \(String(format: "%.1f m", location.altitude)) ACC: \(String(format: "%.1f m", location.horizontalAccuracy))")
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        lines.append("TIME: \(formatter.string(from: Date()))")
+        
+        if !address.isEmpty {
+            lines.append("ADDR: \(address)")
+        }
+        
+        let text = lines.joined(separator: "\n")
+        let attributedString = NSAttributedString(string: text, attributes: attributes)
+        let rect = attributedString.boundingRect(with: CGSize(width: image.size.width - padding * 2, height: 1000), options: .usesLineFragmentOrigin, context: nil)
+        
+        let bgRect = CGRect(x: 0, y: image.size.height - rect.height - padding * 2, width: image.size.width, height: rect.height + padding * 2)
+        UIColor.black.withAlphaComponent(0.6).setFill()
+        UIRectFill(bgRect)
+        
+        text.draw(in: CGRect(x: padding, y: bgRect.origin.y + padding, width: rect.width, height: rect.height), withAttributes: attributes)
+        
+        if let map = map, config.showsMiniMap {
+            let mapSize = minDimension * 0.25
+            let mapRect = CGRect(x: image.size.width - mapSize - padding, y: bgRect.origin.y - mapSize - padding, width: mapSize, height: mapSize)
+            let path = UIBezierPath(roundedRect: mapRect, cornerRadius: minDimension * 0.02)
+            path.addClip()
+            map.draw(in: mapRect)
+            UIColor.white.setStroke()
+            path.lineWidth = 2
+            path.stroke()
+        }
+    }
+
+    private nonisolated func renderJudicialWatermark(image: UIImage, location: CoreLocation.CLLocation, address: String, minDimension: CGFloat, padding: CGFloat) {
+        let fontSize = minDimension * 0.03
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize * 1.2, weight: .black),
+            .foregroundColor: UIColor.systemYellow
+        ]
+        let bodyAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .bold),
+            .foregroundColor: UIColor.white
+        ]
+        
+        let title = "EVIDENCIA DOCUMENTAL - NS TAGCAM"
+        let ref = "REF: \(Int(Date().timeIntervalSince1970))"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, dd 'de' MMMM 'de' yyyy, HH:mm:ss"
+        let dateStr = formatter.string(from: Date())
+        
+        let locationStr = "COORD: \(String(format: "%.6f, %.6f", location.coordinate.latitude, location.coordinate.longitude)) | ALT: \(Int(location.altitude))m"
+        
+        let bgHeight = minDimension * 0.22
+        let bgRect = CGRect(x: 0, y: image.size.height - bgHeight, width: image.size.width, height: bgHeight)
+        
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(UIColor.black.withAlphaComponent(0.85).cgColor)
+        context?.fill(bgRect)
+        
+        // Draw yellow accent line
+        context?.setFillColor(UIColor.systemYellow.cgColor)
+        context?.fill(CGRect(x: 0, y: bgRect.origin.y, width: image.size.width, height: 4))
+        
+        title.draw(at: CGPoint(x: padding, y: bgRect.origin.y + padding), withAttributes: titleAttributes)
+        ref.draw(at: CGPoint(x: image.size.width - ref.size(withAttributes: bodyAttributes).width - padding, y: bgRect.origin.y + padding), withAttributes: bodyAttributes)
+        dateStr.draw(at: CGPoint(x: padding, y: bgRect.origin.y + padding + fontSize * 1.5), withAttributes: bodyAttributes)
+        locationStr.draw(at: CGPoint(x: padding, y: bgRect.origin.y + padding + fontSize * 3.0), withAttributes: bodyAttributes)
+        
+        if let logo = UIImage(named: "nsra") {
+            let logoSize = bgHeight * 0.6
+            logo.draw(in: CGRect(x: image.size.width - logoSize - padding, y: bgRect.origin.y + (bgHeight - logoSize) / 2, width: logoSize, height: logoSize), blendMode: .normal, alpha: 0.5)
+        }
+    }
+
+    private nonisolated func renderMinimalistWatermark(image: UIImage, location: CoreLocation.CLLocation, minDimension: CGFloat, padding: CGFloat) {
+        let fontSize = minDimension * 0.025
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .light),
+            .foregroundColor: UIColor.white.withAlphaComponent(0.7)
+        ]
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yy HH:mm"
+        let text = "\(formatter.string(from: Date())) | \(String(format: "%.3f, %.3f", location.coordinate.latitude, location.coordinate.longitude))"
+        
+        let size = text.size(withAttributes: attributes)
+        text.draw(at: CGPoint(x: image.size.width - size.width - padding, y: image.size.height - size.height - padding), withAttributes: attributes)
     }
     
     nonisolated func cropToAspectRatio(image: UIImage, aspectRatio: AspectRatio) -> UIImage {

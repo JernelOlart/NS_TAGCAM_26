@@ -18,6 +18,15 @@ class ViewController: UIViewController {
         let showsMiniMap: Bool
     }
     
+    enum WatermarkPreset: String, CaseIterable {
+        case compact = "Compacto"
+        case technical = "Técnico"
+        case judicial = "Judicial/Documental"
+        case minimalist = "Minimalista"
+    }
+    
+    var currentPreset: WatermarkPreset = .technical
+    
     // MARK: - Properties
     var captureSession: AVCaptureSession!
     var photoOutput: AVCapturePhotoOutput!
@@ -80,6 +89,14 @@ class ViewController: UIViewController {
     let orientationLockButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "lock.rotation"), for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let presetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "text.badge.checkmark"), for: .normal)
         button.tintColor = .white
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -282,6 +299,13 @@ class ViewController: UIViewController {
         imageView.layer.borderColor = UIColor.white.withAlphaComponent(0.35).cgColor
         imageView.backgroundColor = UIColor.white.withAlphaComponent(0.08)
         return imageView
+    }()
+    let watermarkLogoPreview: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "nsra"))
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.alpha = 0.8
+        return iv
     }()
     let horizonGuideView: UIView = {
         let view = UIView()
